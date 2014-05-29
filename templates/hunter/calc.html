@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    {% load staticfiles %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" />
+
+  </head>
+  
+  <body role="document">
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Esoth's Hunter Tools</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/hunter">Spreadsheet</a></li>
+            <li><a href="mailto:oolitegroove@gmail.com">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Save</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container" role="main">
+      <div class="jumbotron">
+        
+        <form action="/hunter/" method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <input type="submit" value="Submit" />
+        </form>
+      </div>
+      
+      {% for spell in spelltable %}
+        <div class="col-sm-4">
+            <div class="list-group">
+            <span class="list-group-item active">Name: {{ spell.name }}</span>
+            <span class="list-group-item">Speed: {{ spell.speed }}</span>
+            {% if spell.weapon %}<span class="list-group-item">Weapon coeff.: {{ spell.weapon }}</span>{% endif %}
+            {% if spell.ap %}<span class="list-group-item">AP coeff.: {{ spell.ap }}</span>{% endif %}
+            {% if spell.critchance %}<span class="list-group-item">Bonus Crit chance: {{ spell.critchance }}</span>{% endif %}
+            {% if spell.critmod %}<span class="list-group-item">Bonus Crit mod {{ spell.critmod }}</span>{% endif %}
+            {% if spell.armor %}<span class="list-group-item">Armor reducing mod {{ spell.armor }}</span>{% endif %}
+            {% if spell.buff %}<span class="list-group-item">Buffs: {{ spell.buff }}</span>{% endif %}
+            {% if spell.spec %}<span class="list-group-item">Spec based mod: {{ spell.spec }}</span>{% endif %}
+            <span class="list-group-item">Focus cost: {{ spell.focus }}</span>
+            {% if spell.cd %}<span class="list-group-item">Cooldown: {{ spell.cd }}</span>{% endif %}
+            <span class="list-group-item">Cast Time: {{ spell.casttime }}</span>
+            <span class="list-group-item">Damage: {{ spell.damage }}</span>
+            <span class="list-group-item">Speed: {{ spell.speed }}</span>
+            <span class="list-group-item">DPS: {{ spell.dps }}</span>
+            <span class="list-group-item">Formula: {{ spell.formula }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  </body>
+</html>
