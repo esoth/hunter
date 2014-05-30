@@ -25,13 +25,13 @@ def CalcView(request):
       meta = HunterMeta()
       meta.race = form_data['race']
       meta.spec = form_data['spec']
-      meta.weaponmin = form_data['weaponmin'] #19049
-      meta.weaponmax = form_data['weaponmax'] # 35379
-      meta.weaponspeed = form_data['weaponspeed']
       meta.talentstr = form_data['talents']
       
       hunter = Hunter()
       hunter.meta = meta
+      hunter.weaponmin = form_data['weaponmin'] #19049
+      hunter.weaponmax = form_data['weaponmax'] # 35379
+      hunter.weaponspeed = form_data['weaponspeed']
       
       hunter.setgear(agility=form_data['agility'],
                      crit=form_data['crit'],
