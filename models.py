@@ -7,15 +7,19 @@ class HunterModel(models.Model):
                             choices=RACES,
                             max_length=20)
     spec = models.IntegerField(default=0,
+                               verbose_name="Specialization",
                                choices=SPECS)
-    weaponmin = models.IntegerField(default=0)
-    weaponmax = models.IntegerField(default=0)
-    weaponspeed = models.FloatField(default=3)
-    talents = models.CharField(default='0000000', max_length=7)
-    agility = models.IntegerField(default=0)
-    crit = models.IntegerField(default=0)
-    haste = models.IntegerField(default=0)
-    mastery = models.IntegerField(default=0)
+    weaponmin = models.IntegerField(default=0,
+                               verbose_name="Weapon (min)",)
+    weaponmax = models.IntegerField(default=0,
+                               verbose_name="Weapon (max)",)
+    weaponspeed = models.FloatField(default=3,
+                               verbose_name="Weapon Speed",)
+    #talents = models.CharField(default='0000000', max_length=7)
+    agility = models.IntegerField(default=21406)
+    crit = models.IntegerField(default=12765)
+    haste = models.IntegerField(default=5550)
+    mastery = models.IntegerField(default=4373)
     readiness = models.IntegerField(default=0)
     multistrike = models.IntegerField(default=0)
     

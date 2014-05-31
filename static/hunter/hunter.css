@@ -1,0 +1,33 @@
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-nav > li > a {
+  color: #ABD473;
+}
+
+#calc-tabs {
+  background-image: linear-gradient(to bottom, #3C3C3C 0px, #222222 100%);
+  padding: 1px;
+  border-bottom-color: #ffffff;
+}
+
+#calc-tabs a {
+  color: #ABD473;
+}
+
+#calc-tabs .active a {
+  color: #000000;
+}
+
+.tab-content div {
+  margin-top: 3px;
+}
+
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+  background-image: linear-gradient(to bottom, #CEFF8A 0px, #8AAB5D 100%);
+  border-color: #8AAB5D;
+  color: #000000;
+  text-shadow: none;
+}
+
+#main-body {
+  margin-top: 40px;
+}

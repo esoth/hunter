@@ -25,7 +25,7 @@ def CalcView(request):
       meta = HunterMeta()
       meta.race = form_data['race']
       meta.spec = form_data['spec']
-      meta.talentstr = form_data['talents']
+      #meta.talentstr = form_data['talents']
       
       hunter = Hunter()
       hunter.meta = meta
