@@ -86,7 +86,7 @@
       </ul>
       
       <div class="tab-content">        
-        <div class="tab-pane" id="tabs-stats">
+        <div class="tab-pane fade" id="tabs-stats">
           <div class="panel panel-info">
             <div class="panel-heading">
             <h3 class="panel-title">Note</h3>
@@ -135,7 +135,7 @@
           {% endfor %}
         </div>
       
-        <div class="tab-pane active" id="tabs-spells">
+        <div class="tab-pane fade active" id="tabs-spells">
           {% if not spelltable %}not yet calculated...{% endif %}
           {% for spell in spelltable %}
             <div class="col-sm-4">
@@ -175,11 +175,11 @@
           {% endfor %}
         </div>
         
-        <div class="tab-pane" id="tabs-single">
+        <div class="tab-pane fade" id="tabs-single">
           NYI
         </div>
         
-        <div class="tab-pane" id="tabs-aoe">
+        <div class="tab-pane fade" id="tabs-aoe">
           NYI
         </div>
         
