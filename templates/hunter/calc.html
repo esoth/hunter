@@ -5,13 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     {% load staticfiles %}
-
+    
+    <link rel="icon" href="{% static favicon.ico %}favicon.ico" type="image/x-icon"/>
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" />
     <link rel="stylesheet" type="text/css" href="{% static "hunter/hunter.css" %}" />
 
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    
+    <title>Hunter Tools</title>
   </head>
   
   <body>
@@ -27,7 +30,7 @@
             <li class="active"><a href="/hunter">Spreadsheet</a></li>
             <li><a href="http://twitter.com/esoth">Contact</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+              <a class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="/faq">FAQ</a></li>
                 <li><a href="/about">About</a></li>
@@ -40,9 +43,9 @@
 
     <div class="container-fluid" id="main-body">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
           <h3>Enter Stats:</h3>
-          <form action="/hunter/" method="post">
+          <form action="{% url 'hunter:calc' %}" method="post">
             {% csrf_token %}
             <table class="table">
               {{ form.as_table }}
@@ -53,9 +56,23 @@
             </button>
           </form>
         </div>
-        <div class="col-md-6">
+        
+        <div class="col-md-2" id="vertical-banner">
+          <img class="center" src="{% static "hunter/shoot.png" %}" />
+        </div>
+        
+        <div class="col-md-5">
           <h3>Armory Import:</h3>
-          <img src="http://placekitten.com/328/404" />
+          <form action="{% url 'hunter:armory_process' %}" method="post">
+            {% csrf_token %}
+            <table class="table">
+              {{ armory.as_table }}
+            </table>
+            <button type="submit" class="btn btn-success">
+              Shoot
+              <span class="glyphicon glyphicon-screenshot"></span>
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -70,30 +87,89 @@
       
       <div class="tab-content">        
         <div class="tab-pane" id="tabs-stats">
-          NYI: AP and weapon damage calcs though
+          <div class="panel panel-info">
+            <div class="panel-heading">
+            <h3 class="panel-title">Note</h3>
+            </div>
+            <div class="panel-body">The 'total' for each stat excludes procs.</div>
+          </div>
+          {% if not stattable %}not yet calculated...{% endif %}
+          {% for stat in stattable %}
+            <div class="col-sm-4">
+              <div class="panel-hunter panel">
+                <div class="panel-heading">
+                  <h3 class="panel-title">{{ stat.title }}</h3>
+                </div>
+                <div class="panel-body">
+                  <table class="table">
+                    {% for component in stat.components %}
+                      <tr>
+                        <th>
+                          {% if component.description %}
+                            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                               title="{{ component.description }}">
+                              {{ component.title }}
+                            </a>
+                          {% else %}
+                            {{ component.title }}
+                          {% endif %}
+                        </th>
+                        <td>{{ component.value }}</td>
+                      </tr>
+                    {% endfor %}
+                    <tr>
+                      <th>
+                        {% if stat.description %}
+                          <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                             title="{{ stat.description }}">Total</a>
+                        {% else %}
+                          Total
+                        {% endif %}
+                      </th>
+                      <td><span class="badge">{{ stat.total }}</span></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
         </div>
       
         <div class="tab-pane active" id="tabs-spells">
           {% if not spelltable %}not yet calculated...{% endif %}
           {% for spell in spelltable %}
             <div class="col-sm-4">
-                <div class="list-group">
-                <span class="list-group-item active">{{ spell.name }}</span>
-                <span class="list-group-item">Speed: {{ spell.speed }}</span>
-                {% if spell.weapon %}<span class="list-group-item">Weapon coeff.: {{ spell.weapon }}</span>{% endif %}
-                {% if spell.ap %}<span class="list-group-item">AP coeff.: {{ spell.ap }}</span>{% endif %}
-                {% if spell.critchance %}<span class="list-group-item">Bonus Crit chance: {{ spell.critchance }}</span>{% endif %}
-                {% if spell.critmod %}<span class="list-group-item">Bonus Crit mod {{ spell.critmod }}</span>{% endif %}
-                {% if spell.armor %}<span class="list-group-item">Armor reducing mod {{ spell.armor }}</span>{% endif %}
-                {% if spell.buff %}<span class="list-group-item">Buffs: {{ spell.buff }}</span>{% endif %}
-                {% if spell.spec %}<span class="list-group-item">Spec based mod: {{ spell.spec }}</span>{% endif %}
-                <span class="list-group-item">Focus cost: {{ spell.focus }}</span>
-                {% if spell.cd %}<span class="list-group-item">Cooldown: {{ spell.cd }}</span>{% endif %}
-                <span class="list-group-item">Cast Time: {{ spell.casttime }}</span>
-                <span class="list-group-item">Damage: {{ spell.damage }}</span>
-                <span class="list-group-item">Speed: {{ spell.speed }}</span>
-                <span class="list-group-item">DPS: {{ spell.dps }}</span>
-                <span class="list-group-item">Formula: {{ spell.formula }}</span>
+              <div class="panel-hunter panel">
+                <div class="panel-heading">
+                  <h3 class="panel-title">{{ spell.name }}</h3>
+                </div>
+                <div class="panel-body">
+                  <table class="table">
+                    {% for attr in spell.attributes %}
+                      {% if attr.value %}
+                        <tr class="{{ attr.klass }}">
+                          <th>
+                            {% if attr.description %}
+                              <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                                title="{{ attr.description }}">
+                                {{ attr.title }}
+                              </a>
+                            {% else %}
+                              {{ attr.title }}
+                            {% endif %}
+                          </th>
+                          <td>
+                            {% if attr.title == 'Damage' %}
+                               <span class="badge">{{ attr.value }}</span>
+                            {% else %}
+                               {{ attr.value }}
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </table>
+                </div>
               </div>
             </div>
           {% endfor %}
@@ -111,7 +187,8 @@
     </div>
     
     <script type="text/javascript">
-      
+      $('.step-tooltip').tooltip();
+      $('.step-tooltip').css('cursor','pointer');
     </script>
   </body>
 </html>
