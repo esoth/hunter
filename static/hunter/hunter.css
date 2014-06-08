@@ -50,6 +50,10 @@
   border-color: #CEFF8A;
 }
 
+.tooltip-inner {
+  max-width: 1000px;
+}
+
 #main-body {
   margin-top: 40px;
 }
@@ -61,4 +65,50 @@
 #vertical-banner img {
   margin:auto;
   display:block;
+}
+
+#dps_table td {
+  white-space:nowrap;
+}
+
+#dps_table .damage,
+#dps_table .totaltime {
+  text-align: right;
+}
+
+#dps_table .cooldown, .state, .condition {
+  text-align: center;
+}
+
+td.ability_rotation {
+  vertical-align: middle;
+}
+
+td.kill-command_rotation {  
+  background: linear-gradient(#BE593D, #F8C487, #BE593D);
+}
+
+td.bestial-wrath_rotation {
+  background-image: linear-gradient(#C49299, #C20D10);
+  color: white;
+}
+
+td.arcane-shot_rotation {
+  background-image: linear-gradient(#CCD35E, #AD8E41);
+}
+
+#footer {
+  border-top: 1px solid #aaaaaa;
+}
+.container .credit {
+  margin: 20px 0;
+  text-align: center;
+}
+.muted {
+  font-size: 85%;
+  color: #999999;
+}
+
+#totals_table {
+  width: 300px;
 }

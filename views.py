@@ -13,6 +13,8 @@ from calcs.huntermeta import HunterMeta
 from calcs.spells import do_spells
 from calcs.tools import PANDARENS
 
+from calcs.execution import dps
+
 from models import HunterModel, ArmoryModel
 
 class CalcModelForm(ModelForm):
@@ -27,6 +29,9 @@ def CalcView(request):
   armory = ArmoryModelForm()
   stattable = None
   spelltable = None
+  meta = None
+  totals = None
+  single = []
   if request.method == 'POST':
     form = CalcModelForm(request.POST)
     if form.is_valid():
@@ -46,11 +51,12 @@ def CalcView(request):
                      crit=form_data['crit'],
                      haste=form_data['haste'],
                      mastery=form_data['mastery'],
-                     readiness=form_data['readiness'],
+                     versatility=form_data['versatility'],
                      multistrike=form_data['multistrike'])
       
       spelltable = do_spells(meta,hunter)
       stattable = hunter.do_stats()
+      single,meta,totals = dps.runsingle(hunter)
   else:
     form = CalcModelForm()
 
@@ -58,6 +64,9 @@ def CalcView(request):
                 {'form': form,
                  'stattable': stattable,
                  'spelltable': spelltable,
+                 'single': single,
+                 'meta':meta,
+                 'totals':totals,
                  'armory': armory})
 
 def ArmoryProcessForm(request):
@@ -65,8 +74,8 @@ def ArmoryProcessForm(request):
     form = ArmoryModelForm(request.POST)
     if form.is_valid():
       form_data = form.cleaned_data
-    
-    return redirect('/hunter/%s/%s/%s' % (form_data['region'],form_data['server'],form_data['character']))
+      return redirect('/hunter/%s/%s/%s' % (form_data['region'],form_data['server'],form_data['character']))
+    return redirect('/hunter/')
   else:
     return redirect('/hunter/')
   
@@ -78,19 +87,22 @@ def ArmoryView(request, region, server, character):
   
   spec = 0 # first spec
   
+  def squish(v):
+    return int(v*.0390)
+  
   if data['race'] in PANDARENS:
     data['race'] = PANDARENS[0]
   request.method = 'POST'
   request.POST._mutable = True
-  request.POST['agility'] = data['stats']['agi']
-  request.POST['crit'] = data['stats']['critRating']
-  request.POST['haste'] = data['stats']['hasteRating']
-  request.POST['mastery'] = data['stats']['masteryRating']
-  request.POST['readiness'] = 0
+  request.POST['agility'] = squish(data['stats']['agi'])
+  request.POST['crit'] = squish(data['stats']['critRating'])
+  request.POST['haste'] = squish(data['stats']['hasteRating'])
+  request.POST['mastery'] = squish(data['stats']['masteryRating'])
+  request.POST['versatility'] = 0
   request.POST['multistrike'] = 0
   request.POST['race'] = data['race']
   request.POST['spec'] = data['talents'][spec]['spec']['order']
-  request.POST['weaponmin'] = data['items']['mainHand']['weaponInfo']['damage']['min']
-  request.POST['weaponmax'] = data['items']['mainHand']['weaponInfo']['damage']['max']
+  request.POST['weaponmin'] = squish(data['items']['mainHand']['weaponInfo']['damage']['min'])/2
+  request.POST['weaponmax'] = squish(data['items']['mainHand']['weaponInfo']['damage']['max'])/2
   request.POST['weaponspeed'] = data['items']['mainHand']['weaponInfo']['weaponSpeed']
   return CalcView(request)

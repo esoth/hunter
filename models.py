@@ -20,8 +20,9 @@ class HunterModel(models.Model):
     crit = models.IntegerField(default=12765)
     haste = models.IntegerField(default=5550)
     mastery = models.IntegerField(default=4373)
-    readiness = models.IntegerField(default=0)
+    versatility = models.IntegerField(default=0)
     multistrike = models.IntegerField(default=0)
+    versatility = models.IntegerField(default=0)
     
     #def talents(self):
     #  return ''.join([str(t) for t in (talent1,talent2,talent3,talent4,talent5,talent6,talent7,)])

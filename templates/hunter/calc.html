@@ -67,6 +67,10 @@
             {% csrf_token %}
             <table class="table">
               {{ armory.as_table }}
+              <tr>
+                <th>Item Squish</th>
+                <td><input type="checkbox" checked="checked" disabled="disabled" /></td>
+              </tr>
             </table>
             <button type="submit" class="btn btn-success">
               Shoot
@@ -81,6 +85,7 @@
       <ul id="calc-tabs" class="nav nav-tabs">
         <li><a href="#tabs-stats" data-toggle="tab">Stats</a></li>
         <li class="active"><a href="#tabs-spells" data-toggle="tab">Shots/Abilities</a></li>
+        <li><a href="#tabs-dps" data-toggle="tab">DPS</a></li>
         <li><a href="#tabs-single" data-toggle="tab">Single target</a></li>
         <li><a href="#tabs-aoe" data-toggle="tab">AoE</a></li>
       </ul>
@@ -175,14 +180,151 @@
           {% endfor %}
         </div>
         
+        <div class="tab-pane fade" id="tabs-dps">
+          <h3>Totals</h3>
+          <table class="table" id="totals_table">
+            <tr>
+              <th>DPS:</th>
+              <td><span class="badge">{{ totals.dps }}</span></td>
+            </tr>
+            <tr>
+              <th>Damage:</th>
+              <td><span class="badge">{{ totals.damage }}</span></td>
+            </tr>
+            <tr>
+              <th>Time:</th>
+              <td><span class="badge">{{ totals.time }}</span></td>
+            </tr>
+          </table>
+          
+          <h3>Ability Counts</h3>
+          <table class="table">
+            {% for shot,count in totals.shot_counts.items %}
+              <tr>
+                <th>{{ shot }}:</th>
+                <td>{{ count }}</td>
+              </tr>
+            {% endfor %}
+          </table>          
+        </div>
+        
         <div class="tab-pane fade" id="tabs-single">
-          NYI
+          <table class="table" id="dps_table">
+            <tr>
+              <th colspan="9">Performance</th>
+              <th colspan="{{ meta.cds|length }}">Cooldowns</th>
+              <th colspan="{{ meta.states|length }}">States</th>
+              <th colspan="{{ meta.conditions|length }}">Conditions</th>
+            </tr>
+            <tr>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                  title="Total time">
+                  TT
+                </a>
+              </th>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                  title="Iteration">
+                  #
+                </a>
+              </th>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                  title="Starting Focus">
+                  SF
+                </a>
+              </th>
+              <th>Ability Cast</th>
+              <th>Damage</th>
+              <th>Time</th>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                  title="Focus - passive gains/costs">
+                  FP
+                </a>
+              </th>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                  title="Focus - active gains/costs">
+                  FA
+                </a>
+              </th>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                  title="Damage modifiers from buffs/debuffs/procs">
+                  Mods
+                </a>
+              </th>
+              {% for cd in meta.cds %}
+                <th>{{ cd }}</th>
+              {% endfor %}
+              {% for state in meta.states %}
+                <th>{{ state }}</th>
+              {% endfor %}
+              {% for condition in meta.conditions %}
+                <th>
+                  <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                    title="{{ condition.title }}">
+                    {{ condition.id }}
+                  </a>
+                 </th>
+              {% endfor %}
+            </tr>
+            {% for action in single %}
+              <tr>
+                <td class="totaltime">{{ action.action.totaltime }}</td>
+                <td>{{ action.action.iteration }} </td>
+                <td>{{ action.action.starting_focus }}</td>
+                <td class="ability_rotation {{ action.action.actionid|slugify }}_rotation">{{ action.action.actionid }}</td>
+                <td class="damage">{{ action.action.dmg }}</td>
+                <td>{{ action.action.time }}</td>
+                <td>{{ action.action.focus_passive }}</td>
+                <td>{{ action.action.focus_active }}</td>
+                <td>{{ action.action.modifiers }}</td>
+                {% for cd in action.cds %}
+                  <td class="cooldown">
+                    <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                      title="{{ cd.actionid }} CD">
+                      {% if cd.cdtime <= 0 %}
+                          ready
+                      {% else %}
+                        {{ cd.cdtime }}
+                      {% endif %}
+                    </a>
+                  </td>
+                {% endfor %}
+                {% for state in action.states %}
+                  <td class="state">
+                    <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                      title="{{ state.state_id }} State - duration: {{ state.duration }}, stacks:
+                             {{ state.stacks }}, damage: {{ state.damage_modifier }},
+                             haste: {{ state.time_modifier }}, focus %: {{ state.focus_modifier }}">
+                      {{ state.active }}
+                    </a>
+                  </td>
+                {% endfor %}
+                {% for condition in action.conditions %}
+                  <td class="condition">
+                    {{ condition }}
+                  </td>
+                {% endfor %}                
+              </tr>
+            {% endfor %}
+          </table>
+                
         </div>
         
         <div class="tab-pane fade" id="tabs-aoe">
           NYI
         </div>
         
+      </div>
+    </div>
+    
+    <div id="footer">
+      <div class="container">
+        <p class="muted credit">2014, by Esoth</p>
       </div>
     </div>
     
