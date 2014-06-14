@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    {% load staticfiles %}
+    
+    <link rel="icon" href="{% static favicon.ico %}favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static "hunter/hunter.css" %}" />
+
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    
+    {% block title %}Esoth's Hunter Tools{% endblock %}
+  </head>
+  
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Esoth's Hunter Tools</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/hunter">Spreadsheet</a></li>
+            <li><a href="http://twitter.com/esoth">Contact</a></li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/about">About</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+    
+    <div id="sub-banner">
+    
+    </div>
+    
+    
+    <div class="container-fluid" id="main-body">
+      {% block content %}Welcome to the Proving Grounds!{% endblock %}
+    </div>
+    
+    <div id="footer">
+      <div class="container">
+        <p class="muted credit">2014, by Esoth</p>
+      </div>
+    </div>
+    
+    <script type="text/javascript">
+      $('.step-tooltip').tooltip();
+      $('.step-tooltip').css('cursor','pointer');
+    </script>
+  </body>
+</html>

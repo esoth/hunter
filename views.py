@@ -74,18 +74,22 @@ def ArmoryProcessForm(request):
     form = ArmoryModelForm(request.POST)
     if form.is_valid():
       form_data = form.cleaned_data
-      return redirect('/hunter/%s/%s/%s' % (form_data['region'],form_data['server'],form_data['character']))
+      return redirect('/hunter/%s/%s/%s/%s' % (form_data['region'],form_data['server'],form_data['character'],form_data['spec'] and 1 or 2))
     return redirect('/hunter/')
   else:
     return redirect('/hunter/')
   
 
-def ArmoryView(request, region, server, character):
+def ArmoryView(request, region, server, character, spec=None):
   kwargs = {'region':region,'server':server,'character':character}
   url = 'http://%(region)s.battle.net/api/wow/character/%(server)s/%(character)s?fields=stats,talents,items' % kwargs
   data = json.load(urlopen(url))
   
-  spec = 0 # first spec
+  try:
+    spec = int(spec)
+  except ValueError:
+    spec = 1
+  spec -= 1
   
   def squish(v):
     return int(v*.0390)
@@ -94,6 +98,13 @@ def ArmoryView(request, region, server, character):
     data['race'] = PANDARENS[0]
   request.method = 'POST'
   request.POST._mutable = True
+  talents = [0,0,0,0,0,0,0]
+  for talent in data['talents'][spec]['talents']:
+    talents[ talent['tier'] ] = int(talent['column'])
+  request.POST['talent4'] = talents[3]
+  request.POST['talent5'] = talents[4]
+  request.POST['talent6'] = talents[5]
+  request.POST['talent7'] = talents[6]
   request.POST['agility'] = squish(data['stats']['agi'])
   request.POST['crit'] = squish(data['stats']['critRating'])
   request.POST['haste'] = squish(data['stats']['hasteRating'])

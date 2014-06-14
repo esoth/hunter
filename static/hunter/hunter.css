@@ -1,3 +1,9 @@
+#sub-banner {
+  height: 25px;
+  background: transparent url(inv_misc_ammo_arrow_01.jpg) repeat-x;
+  margin: 40px 40px 0 40px;
+}
+
 .navbar-inverse .navbar-brand,
 .navbar-inverse .navbar-nav > li > a {
   color: #ABD473;
@@ -54,10 +60,6 @@
   max-width: 1000px;
 }
 
-#main-body {
-  margin-top: 40px;
-}
-
 #vertical-banner {
   margin-top: 40px;
 }
@@ -72,16 +74,26 @@
 }
 
 #dps_table .damage,
-#dps_table .totaltime {
+#dps_table .totaltime,
+#dps_table .focus_active {
   text-align: right;
 }
 
-#dps_table .cooldown, .state, .condition {
+#dps_table .cooldown,
+#dps_table .state,
+#dps_table .condition,
+#dps_table th.headers,
+#dps_table th.headers_last {
   text-align: center;
+}
+
+#dps_table th.headers {
+  border-right: 1px solid #DDDDDD;
 }
 
 td.ability_rotation {
   vertical-align: middle;
+  text-align: center;
 }
 
 td.kill-command_rotation {  
@@ -95,6 +107,10 @@ td.bestial-wrath_rotation {
 
 td.arcane-shot_rotation {
   background-image: linear-gradient(#CCD35E, #AD8E41);
+}
+
+td.cobra-shot_rotation {
+  background-image: linear-gradient(#90E71F, #244404);
 }
 
 #footer {
