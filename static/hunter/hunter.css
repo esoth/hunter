@@ -179,6 +179,16 @@ td.focusing-shot_rotation {
 td.kill-shot_rotation {
   background-image: linear-gradient(#FF0000, #DBEAF9, #FF0000);
 }
+
+td.stampede_rotation {
+  background-image: linear-gradient(#D1A000, #8D7000);
+}
+
+td.a-murder-of-crows_rotation {
+  background-image: linear-gradient(#7BC6CD, #527387);
+}
+  
+
 #footer {
   border-top: 1px solid #aaaaaa;
 }
