@@ -1,21 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    {% load staticfiles %}
+{% extends "base.html" %}
+{% load staticfiles %}
 
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" type="text/css" href="{% static "hunter/hunter.css" %}" />
+{% block content %}
 
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  </head>
-  
-  <body>
-
-    This front page really ties the web site together...
-  </body>
-</html>
+    To do:
+    <ul>
+      <li>Do a pass on all spells</li>
+      <li>Level 100 talents</li>
+      <li>All pet stuff</li>
+      <li>Dire Beast and Fervor</li>
+      <li>Piercing Shots</li>
+      <li>Aimed Shot draenor perk</li>
+      <li>Focus Fire and draenor perk</li>
+      <li>Kill Shot</li>
+      <li>Careful Aim</li>
+      <li>Multistrike</li>
+      <li>Piercing Shots multistrike perk</li>
+      <li>Versatility</li>
+      <li>Viper Venom</li>
+      <li>ITEMS!</li>
+      <li>Procs, especially trinkets</li>
+      <li>Base stats</li>
+      <li>Correct food/flask</li>
+      <li>Potions</li>
+      <li>Options section on input tab</li>
+      <li>Get the proper proc chance for LnL - right now just set to 10s</li>
+      <li>verify Mastery numbers</li>
+      <li>Attunements</li>
+    </ul>
+{% endblock %}

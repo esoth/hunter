@@ -75,7 +75,8 @@
 
 #dps_table .damage,
 #dps_table .totaltime,
-#dps_table .focus_active {
+#dps_table .focus_active,
+.totals_column {
   text-align: right;
 }
 
@@ -83,8 +84,14 @@
 #dps_table .state,
 #dps_table .condition,
 #dps_table th.headers,
-#dps_table th.headers_last {
+#dps_table th.conditions_header {
   text-align: center;
+}
+
+.conditions_header, .condition,
+.states_header, .state,
+.cooldowns_header, .cooldown {
+  display: none;
 }
 
 #dps_table th.headers {
@@ -113,6 +120,65 @@ td.cobra-shot_rotation {
   background-image: linear-gradient(#90E71F, #244404);
 }
 
+td.rapid-fire_rotation {
+  background-image: linear-gradient(#9D0000, #6D0204);
+  color: white;
+}
+
+td.steady-shot_rotation {
+  background-image: linear-gradient(#FFFFFF, #C69216);
+}
+
+td.glaive-toss_rotation {
+  background-image: linear-gradient(#74BED1, #6A6246);
+}
+
+td.powershot_rotation {
+  background-image: linear-gradient(#F0EE00, #FF7C29);
+}
+
+td.barrage_rotation {
+  background-image: linear-gradient(#8CE3FF, #106394);
+}
+
+td.chimera-shot_rotation {
+  background-image: linear-gradient(#CA30DB, #879CA9);
+}
+
+td.aimed-shot_rotation {
+  background-image: linear-gradient(#CECBB8, #A19178);
+}
+
+td.black-arrow_rotation {
+  background-image: linear-gradient(#6B0A9D, #000000, #6B0A9D);
+  color: white;
+}
+
+td.explosive-shot_rotation {
+  background-image: linear-gradient(#8A2319, #D38221);
+}
+
+td.dire-beast_rotation {
+  background-image: linear-gradient(#436E7E, #BE0404);
+}
+
+td.fervor_rotation {
+  background-image: linear-gradient(#666BE7, #563092);
+  color: white;
+}
+
+td.explosive-trap_rotation {
+  background-image: linear-gradient(#DF8537, #440400);
+}
+
+td.focusing-shot_rotation {
+  background-image: linear-gradient(#BC1817, #801D22);
+  color: white;
+}
+
+td.kill-shot_rotation {
+  background-image: linear-gradient(#FF0000, #DBEAF9, #FF0000);
+}
 #footer {
   border-top: 1px solid #aaaaaa;
 }
@@ -123,8 +189,4 @@ td.cobra-shot_rotation {
 .muted {
   font-size: 85%;
   color: #999999;
-}
-
-#totals_table {
-  width: 300px;
 }

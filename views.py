@@ -27,8 +27,8 @@ class ArmoryModelForm(ModelForm):
 
 def CalcView(request):
   armory = ArmoryModelForm()
-  stattable = None
-  spelltable = None
+  stattable = []
+  spelltable = []
   meta = None
   totals = None
   single = []
@@ -39,10 +39,13 @@ def CalcView(request):
       meta = HunterMeta()
       meta.race = form_data['race']
       meta.spec = form_data['spec']
+      meta.talent4 = form_data['talent4']
+      meta.talent5 = form_data['talent5']
+      meta.talent6 = form_data['talent6']
+      meta.talent7 = form_data['talent7']
       #meta.talentstr = form_data['talents']
       
-      hunter = Hunter()
-      hunter.meta = meta
+      hunter = Hunter(meta)
       hunter.weaponmin = form_data['weaponmin'] #19049
       hunter.weaponmax = form_data['weaponmax'] # 35379
       hunter.weaponspeed = form_data['weaponspeed']
@@ -59,11 +62,15 @@ def CalcView(request):
       single,meta,totals = dps.runsingle(hunter)
   else:
     form = CalcModelForm()
+  import itertools
+  def grouper(iterable):
+    args = [iter(iterable)] * 3
+    return itertools.izip_longest(*args, fillvalue=None)
 
   return render(request, 'hunter/calc.html',
                 {'form': form,
-                 'stattable': stattable,
-                 'spelltable': spelltable,
+                 'stattable': grouper(stattable),
+                 'spelltable': grouper(spelltable),
                  'single': single,
                  'meta':meta,
                  'totals':totals,
@@ -88,6 +95,8 @@ def ArmoryView(request, region, server, character, spec=None):
   try:
     spec = int(spec)
   except ValueError:
+    spec = 1
+  except TypeError:
     spec = 1
   spec -= 1
   
