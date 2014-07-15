@@ -25,6 +25,41 @@ class ArmoryModelForm(ModelForm):
     class Meta:
       model = ArmoryModel
 
+def ModelView(request):
+  form = CalcModelForm(request.GET)
+  data = form.data
+  meta,hunter = processFormData(data)
+  single,meta,totals = dps.runsingle(hunter)
+  
+  return render(request, 'hunter/model.html',
+                {'single': single,
+                 'meta': meta,
+                 'totals': totals})
+
+def processFormData(data):
+  meta = HunterMeta()
+  meta.race = int(data['race'] or 0)
+  meta.spec = int(data['spec'] or 0)
+  meta.talent4 = int(data['talent4'] or 0)
+  meta.talent5 = int(data['talent5'] or 0)
+  meta.talent6 = int(data['talent6'] or 0)
+  meta.talent7 = int(data['talent7'] or 0)
+  #meta.talentstr = data['talents']
+  
+  hunter = Hunter(meta)
+  hunter.weaponmin = int(data['weaponmin'])
+  hunter.weaponmax = int(data['weaponmax'])
+  hunter.weaponspeed = float(data['weaponspeed'])
+  
+  hunter.setgear(agility=int(data['agility']),
+                 crit=int(data['crit']),
+                 haste=int(data['haste']),
+                 mastery=int(data['mastery']),
+                 versatility=int(data['versatility']),
+                 multistrike=int(data['multistrike']))
+  return meta,hunter
+  
+
 def CalcView(request):
   armory = ArmoryModelForm()
   stattable = []
@@ -36,26 +71,7 @@ def CalcView(request):
     form = CalcModelForm(request.POST)
     if form.is_valid():
       form_data = form.cleaned_data
-      meta = HunterMeta()
-      meta.race = form_data['race']
-      meta.spec = form_data['spec']
-      meta.talent4 = form_data['talent4']
-      meta.talent5 = form_data['talent5']
-      meta.talent6 = form_data['talent6']
-      meta.talent7 = form_data['talent7']
-      #meta.talentstr = form_data['talents']
-      
-      hunter = Hunter(meta)
-      hunter.weaponmin = form_data['weaponmin'] #19049
-      hunter.weaponmax = form_data['weaponmax'] # 35379
-      hunter.weaponspeed = form_data['weaponspeed']
-      
-      hunter.setgear(agility=form_data['agility'],
-                     crit=form_data['crit'],
-                     haste=form_data['haste'],
-                     mastery=form_data['mastery'],
-                     versatility=form_data['versatility'],
-                     multistrike=form_data['multistrike'])
+      meta,hunter = processFormData(form_data)
       
       spelltable = do_spells(meta,hunter)
       stattable = hunter.do_stats()

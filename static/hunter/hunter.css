@@ -88,6 +88,15 @@
   text-align: center;
 }
 
+#dps_table th, #dps_table td {
+  text-align: center;
+}
+
+#dps_table th.right,
+#dps_table td.right, {
+  text-align: right;
+}
+
 .conditions_header, .condition,
 .states_header, .state,
 .cooldowns_header, .cooldown {
@@ -159,7 +168,8 @@ td.explosive-shot_rotation {
 }
 
 td.dire-beast_rotation {
-  background-image: linear-gradient(#436E7E, #BE0404);
+  background-image: linear-gradient(#BE0404, #436E7E);
+  color: white;
 }
 
 td.fervor_rotation {

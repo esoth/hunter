@@ -15,7 +15,7 @@
       <div class="row">
         <div class="col-md-5">
           <h3>Enter Stats:</h3>
-          <form action="{% url 'hunter:calc' %}" method="post">
+          <form action="{% url 'hunter:calc' %}" method="post" id="hunter-form">
             {% csrf_token %}
             <table class="table">
               {{ form.as_table }}
@@ -119,19 +119,6 @@
                       </th>
                       <td>{{ stat.total }}</td>
                     </tr>
-                    {% if stat.totalp %}
-                    <tr>
-                      <th>
-                        {% if stat.description %}
-                          <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                             title="{{ stat.description }}">Total</a>
-                        {% else %}
-                          Total %
-                        {% endif %}
-                      </th>
-                      <td><span class="badge">{{ stat.totalp|stringformat:".02f" }}%</span></td>
-                    </tr>
-                  {% endif %}
                   </table>
                 </div>
               </div>
@@ -198,182 +185,68 @@
     </div>
     
     <div class="tab-pane fade" id="tabs-single">
-      <div class="row">
-        <div class="col-md-5">
-          <h3>Totals</h3>
-          <table class="table" id="totals_table">
-            <tr>
-              <th>DPS:</th>
-              <td class="totals_column"><span class="badge">{{ totals.dps }}</span></td>
-            </tr>
-            <tr>
-              <th>Damage:</th>
-              <td class="totals_column">{{ totals.damage }}</td>
-            </tr>
-            <tr>
-              <th>Time:</th>
-              <td class="totals_column">{{ totals.time|stringformat:".02f" }}</td>
-            </tr>
-          </table>
+      {% if totals %}
+        <div class="col-lg-13">
+          <a href="#" target="_blank" class="btn btn-primary btn-lg" id="full-model">View Model</a> -
+          view a full model of all abilities in action.
+          <span class="text-danger">WARNING: this is a lot of data and can take awhile to load!</span>
         </div>
-          
-        <div class="col-md-5">
-          <h3>Ability Counts</h3>
-          <table class="table">
-            <thead>
+        <div class="row">
+          <div class="col-md-5">
+            <h3>Totals</h3>
+            <table class="table" id="totals_table">
               <tr>
-                <th>Ability</th>
-                <th class="totals_column">Count</th>
-                <th class="totals_column">Damage</th>
-                <th class="totals_column">%</th>
+                <th>DPS:</th>
+                <td class="totals_column"><span class="badge">{{ totals.dps }}</span></td>
               </tr>
-            </thead>
-            {% for shot in totals.shots %}
               <tr>
-                <th>{{ shot.name }}:</th>
-                <td class="totals_column">{{ shot.counter }}</td>
-                <td class="totals_column">{{ shot.total|stringformat:"0.2f" }}</td>
-                <td class="totals_column">{{ shot.percent|stringformat:"0.2f" }}%</td>
+                <th>Damage:</th>
+                <td class="totals_column">{{ totals.damage }}</td>
               </tr>
-            {% endfor %}
-          </table>
-        </div>
-      </div>
-      
-      <h3>Model</h3>
-      <a href="javascript:void(0);" id="cooldown_toggle">toggle cooldowns</a> |
-      <a href="javascript:void(0);" id="state_toggle">toggle states</a> |
-      <a href="javascript:void(0);" id="condition_toggle">toggle conditions</a>
-
-      <table class="table" id="dps_table">
-        <tr>
-          <th class="headers" colspan="10">General</th>
-          <th class="headers cooldowns_header" colspan="{{ meta.cds|length }}">Cooldowns</th>
-          <th class="headers states_header" colspan="{{ meta.states|length }}">States</th>
-          <th class="headers conditions_header" colspan="{{ meta.conditions|length }}">Conditions</th>
-        </tr>
-        <tr>
-          <th>
-            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-              title="Total time">
-              TT
-            </a>
-          </th>
-          <th>
-            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-              title="Starting Focus">
-              SF
-            </a>
-          </th>
-          <th>Ability Cast</th>
-          <th>Damage</th>
-          <th>Time</th>
-          <th>
-            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-              title="Focus - passive gains/costs">
-              FP
-            </a>
-          </th>
-          <th class="focus_active">
-            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-              title="Focus - active gains/costs">
-              FA
-            </a>
-          </th>
-          <th>
-            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-              title="Damage modifiers from buffs/debuffs/procs">
-              Dmg Mods
-            </a>
-          </th>
-          <th>
-            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-              title="Haste modifiers from buffs/debuffs/procs">
-              Time Mods
-            </a>
-          </th>
-          {% for cd in meta.cds %}
-            <th class="cooldown">{{ cd }}</th>
-          {% endfor %}
-          {% for state in meta.states %}
-            <th class="state">{{ state }}</th>
-          {% endfor %}
-          {% for condition in meta.conditions %}
-            <th class="condition">
-              <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                title="{{ condition.title }}">
-                {{ condition.id }}
-              </a>
-             </th>
-          {% endfor %}
-        </tr>
-        {% for action in single %}
-          <tr>
-            <td class="totaltime">
-                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                  title="{{ action.action.boss_health }} boss health">
-                  {{ action.action.totaltime }}
-                </a>
-            </td>
-            <td>{{ action.action.starting_focus }}</td>
-            <td class="ability_rotation {{ action.action.actionid|slugify }}_rotation">{{ action.action.actionid }}</td>
-            <td class="damage">{{ action.action.dmg }}</td>
-            <td>{{ action.action.time }}</td>
-            <td>{{ action.action.focus_passive }}</td>
-            <td class="focus_active">{{ action.action.focus_active }}</td>
-            <td>{{ action.action.modifiers }}</td>
-            <td>{{ action.action.t_modifiers }}</td>
-            {% for cd in action.cds %}
-              <td class="cooldown">
-                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                  title="{{ cd.actionid }} CD">
-                  {% if cd.cdtime <= 0 %}
-                      ready
-                  {% else %}
-                    {{ cd.cdtime|stringformat:".02f" }}
-                  {% endif %}
-                </a>
-              </td>
-            {% endfor %}
-            {% for state in action.states %}
-              <td class="state">
-                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                  title="{{ state.state_id }} State - duration: {{ state.duration }}, stacks:
-                         {{ state.stacks }}, damage: {{ state.damage_modifier }}
-                         haste: {{ state.time_modifier }}, focus %: {{ state.focus_modifier }}">
-                  {{ state.active }}
-                </a>
-              </td>
-            {% endfor %}
-            {% for condition in action.conditions %}
-              <td class="condition">
-                {{ condition }}
-              </td>
-            {% endfor %}                
-          </tr>
-        {% endfor %}
-      </table>
+              <tr>
+                <th>Time:</th>
+                <td class="totals_column">{{ totals.time|stringformat:".02f" }}</td>
+              </tr>
+            </table>
+          </div>
             
+          <div class="col-md-5">
+            <h3>Ability Counts</h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Ability</th>
+                  <th class="totals_column">Count</th>
+                  <th class="totals_column">Damage</th>
+                  <th class="totals_column">%</th>
+                </tr>
+              </thead>
+              {% for shot in totals.shots %}
+                <tr>
+                  <th>{{ shot.name }}:</th>
+                  <td class="totals_column">{{ shot.counter }}</td>
+                  <td class="totals_column">{{ shot.total|stringformat:"0.2f" }}</td>
+                  <td class="totals_column">{{ shot.percent|stringformat:"0.2f" }}%</td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      {% else %}
+        <p>Submit the form to calculate single target DPS</p>
+      {% endif %}
+      <br/>
+      <br/>
     </div>
     
     <div class="tab-pane fade" id="tabs-aoe">
       NYI
     </div>
-
-    <script type="text/javascript">
-      $('#cooldown_toggle').click(function () {
-        $('.cooldown').toggle();
-        $('.cooldowns_header').toggle();
-      });
-      $('#state_toggle').click(function () {
-        $('.state').toggle();
-        $('.states_header').toggle();
-      });
-      $('#condition_toggle').click(function () {
-        $('.condition').toggle();
-        $('.conditions_header').toggle();
-      });
-    </script>
+    
+   <script type="text/javascript">
+     url = "/hunter/model?" + $('#hunter-form').serialize();
+     $('#full-model').attr('href',url);
+   </script>
 
   </div>
 {% endblock %}

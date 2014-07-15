@@ -17,9 +17,9 @@ class HunterModel(models.Model):
     spec = models.IntegerField(default=0,
                                verbose_name="Specialization",
                                choices=SPECS)
-    weaponmin = models.IntegerField(default=0,
+    weaponmin = models.IntegerField(default=952,
                                verbose_name="Weapon (min)",)
-    weaponmax = models.IntegerField(default=0,
+    weaponmax = models.IntegerField(default=1430,
                                verbose_name="Weapon (max)",)
     weaponspeed = models.FloatField(default=3,
                                verbose_name="Weapon Speed",)
@@ -44,16 +44,12 @@ class HunterModel(models.Model):
     talent7 = models.IntegerField(default=tier7[0],
                                verbose_name="Talents - level 100",
                                choices=tier7,max_length=30)
-    agility = models.IntegerField(default=1000) #21406)
-    crit = models.IntegerField(default=12765)
-    haste = models.IntegerField(default=5550)
-    mastery = models.IntegerField(default=4373)
-    versatility = models.IntegerField(default=0)
-    multistrike = models.IntegerField(default=0)
-    versatility = models.IntegerField(default=0)
-    
-    #def talents(self):
-    #  return ''.join([str(t) for t in (talent1,talent2,talent3,talent4,talent5,talent6,talent7,)])
+    agility = models.IntegerField(default=2377) #21406)
+    crit = models.IntegerField(default=1052)
+    haste = models.IntegerField(default=748)
+    mastery = models.IntegerField(default=737)
+    multistrike = models.IntegerField(default=506)
+    versatility = models.IntegerField(default=77)
 
 class ArmoryModel(models.Model):
     region = models.CharField(choices=REGIONS,
