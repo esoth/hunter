@@ -75,7 +75,7 @@ def CalcView(request):
       
       spelltable = do_spells(meta,hunter)
       stattable = hunter.do_stats()
-      single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST['lastcalc']))
+      single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
   else:
     form = CalcModelForm()
   import itertools
