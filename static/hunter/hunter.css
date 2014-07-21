@@ -142,6 +142,10 @@ td.glaive-toss_rotation {
   background-image: linear-gradient(#74BED1, #6A6246);
 }
 
+td.focus-fire_rotation {
+  background-image: linear-gradient(#FFEA1B, #AD8F2B);
+}
+
 td.powershot_rotation {
   background-image: linear-gradient(#F0EE00, #FF7C29);
 }

@@ -12,8 +12,8 @@
   
         <table class="table" id="dps_table">
           <tr>
-            <th class="headers" colspan="10">General</th>
-            <th class="pet" colspan="2">Pet</th>
+            <th class="headers" colspan="12">General</th>
+            <th class="pet" colspan="3">Pet</th>
             <th class="headers cooldowns_header" colspan="{{ meta.cds|length }}">Cooldowns</th>
             <th class="headers states_header" colspan="{{ meta.states|length }}">States</th>
             <th class="headers conditions_header" colspan="{{ meta.conditions|length }}">Conditions</th>
@@ -64,6 +64,24 @@
                 Time Mods
               </a>
             </th>
+            <th>
+              <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                title="Auto shot damage in this time frame">
+                Auto
+              </a>
+            </th>
+            <th>
+              <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                title="Exotic munitions damage in this time frame">
+                EM
+              </a>
+            </th>
+            <th>
+              <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                title="Pet auto attack damage in this time frame">
+                PA
+              </a>
+            </th>            
             <th class="right">
               <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
                 title="Pet focus">
@@ -108,6 +126,9 @@
               <td class="right focus_active">{{ action.action.focus_active }}</td>
               <td>{{ action.action.modifiers }}</td>
               <td>{{ action.action.t_modifiers }}</td>
+              <td>{{ action.action.auto }}</td>
+              <td>{{ action.action.poison }}</td>
+              <td>{{ action.action.pet_auto }}</td>
               <td class="right">{{ action.pet.focus }}</td>
               <td class="right">{{ action.pet.damage|stringformat:".02f" }}</td>
               {% for cd in action.cds %}

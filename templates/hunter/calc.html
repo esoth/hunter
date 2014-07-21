@@ -17,6 +17,7 @@
           <h3>Enter Stats:</h3>
           <form action="{% url 'hunter:calc' %}" method="post" id="hunter-form">
             {% csrf_token %}
+            <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
             <table class="table">
               {{ form.as_table }}
             </table>
@@ -51,7 +52,14 @@
       </div>
       
       {% if totals %}
-        <h3>DPS: <span class="badge">{{ totals.dps }}</span></h3>
+        <h3>
+          DPS: {{ totals.dps }}
+          {% if totals.diff_success == "success" %}
+            <small class="text-success">(+{{ totals.diff }})</small>
+          {% else %}
+            <small class="text-warning">(-{{ totals.diff }})</small>
+          {% endif %}
+        </h3>
         <p>Please use the other tabs for more detailed results</p>
       {% else %}
         <div class="panel panel-warning">
