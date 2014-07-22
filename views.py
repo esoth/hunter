@@ -11,7 +11,7 @@ from django.forms import ModelForm
 from calcs.hunter import Hunter
 from calcs.huntermeta import HunterMeta
 from calcs.spells import do_spells
-from calcs.tools import PANDARENS
+from calcs.tools import PANDARENS, UNDEAD
 
 from calcs.execution import dps
 
@@ -29,7 +29,7 @@ def ModelView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  single,meta,totals = dps.runsingle(hunter)
+  single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
   
   return render(request, 'hunter/model.html',
                 {'single': single,
@@ -74,6 +74,8 @@ def CalcView(request):
       meta,hunter = processFormData(form_data)
       
       spelltable = do_spells(meta,hunter)
+      if meta.race != UNDEAD:
+        spelltable = [spell for spell in spelltable if spell['name'] != 'Touch of the Grave']
       stattable = hunter.do_stats()
       single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
   else:
