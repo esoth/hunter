@@ -216,9 +216,6 @@
                 <td class="totals_column">{{ totals.time|stringformat:".02f" }}</td>
               </tr>
             </table>
-          </div>
-            
-          <div class="col-md-5">
             <h3>Ability Counts</h3>
             <table class="table">
               <thead>
@@ -238,6 +235,52 @@
                 </tr>
               {% endfor %}
             </table>
+          </div>
+            
+          <div class="col-md-5">
+            <div id="container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
+        
+            <script type="text/javascript">
+              $(function () {
+                $('#container').highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: 1,//null,
+                        plotShadow: false
+                    },
+                    title: {
+                        text: 'Ability Breakdown'
+                    },
+                    tooltip: {
+                	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                style: {
+                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        type: 'pie',
+                        name: 'Per cent of total',
+                        data: [
+                          {% for shot in totals.shots|dictsort:"percent" %}
+                            {% if shot.percent %}
+                              ['{{ shot.name }}', {{ shot.percent }}],
+                            {% endif %}
+                          {% endfor %}
+                        ]
+                    }]
+                });
+            });
+            </script>
           </div>
         </div>
       {% else %}
