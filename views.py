@@ -11,7 +11,7 @@ from django.forms import ModelForm
 from calcs.hunter import Hunter
 from calcs.huntermeta import HunterMeta
 from calcs.spells import do_spells
-from calcs.tools import PANDARENS, UNDEAD
+from calcs.tools import *
 
 from calcs.execution import dps
 
@@ -36,6 +36,42 @@ def ModelView(request):
                  'meta': meta,
                  'totals': totals})
 
+def ModelDebugView(request):
+  form = CalcModelForm(request.GET)
+  data = form.data
+  meta,hunter = processFormData(data)
+  single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+  
+  return render(request, 'hunter/model.html',
+                {'single': single,
+                 'meta': meta,
+                 'totals': totals,
+                 'debug': True})
+
+def ScalingView(request):
+  form = CalcModelForm(request.GET)
+  data = form.data
+  meta,hunter = processFormData(data)
+  d = dps.runsingle(hunter,lastcalc=0)[-1]['dps']
+  scales = {'agility':[d],'crit':[d],'haste':[d],'mastery':[d],'multistrike':[d],'versatility':[d]}
+  
+  for stat in scales.keys():
+    gearstat = getattr(hunter,stat)
+    start = gearstat.gear()
+    _stat = start
+    for x in range(1,11):
+      _stat = start + x*10
+      gearstat.gear(_stat)
+      scales[stat].append(dps.runsingle(hunter,lastcalc=0)[-1]['dps'])
+    gearstat.gear(start)
+  
+  specs = ['Beast Mastery','Marksmanship','Survival']
+  subtitle = specs[meta.spec] + ': ' + ', '.join([TIER4[meta.talent4],TIER5[meta.talent5],TIER6[meta.talent6],TIER7[meta.talent7]])
+  
+  return render(request, 'hunter/scale.html',
+                {'scales':scales,
+                 'subtitle':subtitle})
+
 def processFormData(data):
   meta = HunterMeta()
   meta.race = int(data['race'] or 0)
@@ -44,7 +80,6 @@ def processFormData(data):
   meta.talent5 = int(data['talent5'] or 0)
   meta.talent6 = int(data['talent6'] or 0)
   meta.talent7 = int(data['talent7'] or 0)
-  #meta.talentstr = data['talents']
   
   hunter = Hunter(meta)
   hunter.weaponmin = int(data['weaponmin'])

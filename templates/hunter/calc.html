@@ -8,6 +8,7 @@
     <li><a href="#tabs-spells" data-toggle="tab">Shots/Abilities</a></li>
     <li><a href="#tabs-single" data-toggle="tab">Single target</a></li>
     <li><a href="#tabs-aoe" data-toggle="tab">AoE</a></li>
+    <li><a href="#tabs-scaling" data-toggle="tab">Scaling</a></li>
   </ul>
   
   <div class="tab-content">
@@ -197,7 +198,6 @@
         <div class="col-lg-13">
           <a href="#" target="_blank" class="btn btn-primary btn-lg" id="full-model">View Model</a> -
           view a full model of all abilities in action.
-          <span class="text-danger">WARNING: this is a lot of data and can take awhile to load!</span>
         </div>
         <div class="row">
           <div class="col-md-5">
@@ -251,9 +251,23 @@
       NYI
     </div>
     
+    <div class="tab-pane fade" id="tabs-scaling">
+      {% if totals %}
+        <div class="container">
+          <a href="#" target="_blank" class="btn btn-primary btn-lg" id="full-scale">Scaling</a> -
+            compute values for stats
+          </a>
+        </div>
+      {% else %}
+        <p>Submit the form to calculate</p>
+      {% endif %}
+    </div>
+    
    <script type="text/javascript">
-     url = "/hunter/model?" + $('#hunter-form').serialize();
-     $('#full-model').attr('href',url);
+     model_url = "/hunter/model?" + $('#hunter-form').serialize();
+     $('#full-model').attr('href',model_url);
+     scale_url = "/hunter/scaling?" + $('#hunter-form').serialize();
+     $('#full-scale').attr('href',scale_url);
    </script>
 
   </div>

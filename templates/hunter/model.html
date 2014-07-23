@@ -5,7 +5,7 @@
     <div id="content">
       
       <div id="model">
-        <h3>Model</h3>
+        <h3>DPS: {{ totals.dps }}</h3>
         <a href="javascript:void(0);" id="cooldown_toggle">toggle cooldowns</a> |
         <a href="javascript:void(0);" id="state_toggle">toggle states</a> |
         <a href="javascript:void(0);" id="condition_toggle">toggle conditions</a>
@@ -94,20 +94,22 @@
                 PD
               </a>
             </th>
-            {% for cd in meta.cds %}
-              <th class="cooldown">{{ cd }}</th>
-            {% endfor %}
-            {% for state in meta.states %}
-              <th class="state">{{ state }}</th>
-            {% endfor %}
-            {% for condition in meta.conditions %}
-              <th class="condition">
-                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                  title="{{ condition.title }}">
-                  {{ condition.id }}
-                </a>
-               </th>
-            {% endfor %}
+            {% if debug %}
+              {% for cd in meta.cds %}
+                <th class="cooldown">{{ cd }}</th>
+              {% endfor %}
+              {% for state in meta.states %}
+                <th class="state">{{ state }}</th>
+              {% endfor %}
+              {% for condition in meta.conditions %}
+                <th class="condition">
+                  <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                    title="{{ condition.title }}">
+                    {{ condition.id }}
+                  </a>
+                 </th>
+              {% endfor %}
+            {% endif %}
           </tr>
           {% for action in single %}
             <tr>
@@ -131,31 +133,27 @@
               <td>{{ action.action.pet_auto }}</td>
               <td class="right">{{ action.pet.focus }}</td>
               <td class="right">{{ action.pet.damage|stringformat:".02f" }}</td>
-              {% for cd in action.cds %}
-                <td class="cooldown">
-                  <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                    title="{{ cd.actionid }} CD">
-                    {% if cd.cdtime <= 0 %}
-                        ready
-                    {% else %}
-                      {{ cd.cdtime|stringformat:".02f" }}
-                    {% endif %}
-                  </a>
-                </td>
-              {% endfor %}
-              {% for state in action.states %}
-                <td class="state">
-                  <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                    title="{{ state.tooltip }}">
-                    {{ state.active }}
-                  </a>
-                </td>
-              {% endfor %}
-              {% for condition in action.conditions %}
-                <td class="condition">
-                  {{ condition }}
-                </td>
-              {% endfor %}                
+              {% if debug %}
+                {% for cd in action.cds %}
+                  <td class="cooldown">
+                      {% if cd.cdtime <= 0 %}
+                          ready | {{ cd.actionid }}
+                      {% else %}
+                        {{ cd.cdtime|stringformat:".02f" }}
+                      {% endif %}
+                  </td>
+                {% endfor %}
+                {% for state in action.states %}
+                  <td class="state">
+                    {{ state.tooltip }} | {{ state.active }}
+                  </td>
+                {% endfor %}
+                {% for condition in action.conditions %}
+                  <td class="condition">
+                    {{ condition }}
+                  </td>
+                {% endfor %}
+              {% endif %}
             </tr>
           {% endfor %}
         </table>
@@ -175,6 +173,5 @@
           $('.conditions_header').toggle();
         });
       </script>
-    <div id="content">
   </body>
 {% endblock %}

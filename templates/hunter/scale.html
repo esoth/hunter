@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div id="content">
+      
+      <div id="model">
+        
+        <div id="container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
+        
+        <script type="text/javascript">
+          $(function () {
+            $('#container').highcharts({
+                title: {
+                    text: 'Hunter Relative Stat Values',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: '{{ subtitle }}',
+                    x: -20
+                },
+                xAxis: {
+                    categories: [0,10,20,30,40,50,60,70,80,90,100]
+                },
+                yAxis: {
+                    title: {
+                        text: 'DPS'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: ' DPS'
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    borderWidth: 0
+                },
+                series: [{
+                    name: 'Agility',
+                    data: [{% for x in scales.agility %}{{ x }},{% endfor %}]
+                }, {
+                    name: 'Crit',
+                    data: [{% for x in scales.crit %}{{ x }},{% endfor %}]
+                }, {
+                    name: 'Haste',
+                    data: [{% for x in scales.haste %}{{ x }},{% endfor %}]
+                }, {
+                    name: 'Mastery',
+                    data: [{% for x in scales.mastery %}{{ x }},{% endfor %}]
+                }, {
+                    name: 'Multistrike',
+                    data: [{% for x in scales.multistrike %}{{ x }},{% endfor %}]
+                }, {
+                    name: 'Versatility',
+                    data: [{% for x in scales.versatility %}{{ x }},{% endfor %}]
+                }]
+            });
+          });
+        </script>
+      </div>
+    </div>
+{% endblock %}
