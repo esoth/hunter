@@ -29,7 +29,7 @@ def ModelView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+  single,meta,totals = dps.runner(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
   
   return render(request, 'hunter/model.html',
                 {'single': single,
@@ -40,7 +40,7 @@ def ModelDebugView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+  single,meta,totals = dps.runner(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
   
   return render(request, 'hunter/model.html',
                 {'single': single,
@@ -48,11 +48,22 @@ def ModelDebugView(request):
                  'totals': totals,
                  'debug': True})
 
+def ModelAoEView(request):
+  form = CalcModelForm(request.GET)
+  data = form.data
+  meta,hunter = processFormData(data)
+  single,meta,totals = dps.runner(hunter,aoe=int(request.POST.get('aoe') or 8),lastcalc=float(request.POST.get('lastcalc') or 0))
+  
+  return render(request, 'hunter/model.html',
+                {'single': single,
+                 'meta': meta,
+                 'totals': totals})
+
 def ScalingView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  d = dps.runsingle(hunter,lastcalc=0)[-1]['dps']
+  d = dps.runner(hunter)[-1]['dps']
   scales = {'agility':[d],'crit':[d],'haste':[d],'mastery':[d],'multistrike':[d],'versatility':[d]}
   
   for stat in scales.keys():
@@ -62,7 +73,7 @@ def ScalingView(request):
     for x in range(1,11):
       _stat = start + x*10
       gearstat.gear(_stat)
-      scales[stat].append(dps.runsingle(hunter,lastcalc=0)[-1]['dps'])
+      scales[stat].append(dps.runner(hunter)[-1]['dps'])
     gearstat.gear(start)
   
   specs = ['Beast Mastery','Marksmanship','Survival']
@@ -112,7 +123,8 @@ def CalcView(request):
       if meta.race != UNDEAD:
         spelltable = [spell for spell in spelltable if spell['name'] != 'Touch of the Grave']
       stattable = hunter.do_stats()
-      single,meta,totals = dps.runsingle(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+      single,meta,totals = dps.runner(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+      aoe,dummy,aoetotals = dps.runner(hunter,aoe=8)
   else:
     form = CalcModelForm()
   import itertools
@@ -124,9 +136,9 @@ def CalcView(request):
                 {'form': form,
                  'stattable': grouper(stattable),
                  'spelltable': grouper(spelltable),
-                 'single': single,
                  'meta':meta,
                  'totals':totals,
+                 'aoetotals':aoetotals,
                  'armory': armory})
 
 def ArmoryProcessForm(request):

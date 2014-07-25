@@ -183,6 +183,12 @@ td.fervor_rotation {
 
 td.explosive-trap_rotation {
   background-image: linear-gradient(#DF8537, #440400);
+  color: white;
+}
+
+td.multi-shot_rotation {
+  background-image: linear-gradient(#A45A7D, #817068);
+  color: white;
 }
 
 td.focusing-shot_rotation {

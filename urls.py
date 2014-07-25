@@ -5,6 +5,7 @@ from hunter import views
 urlpatterns = patterns('',
     url(r'^$', views.CalcView, name='calc'),
     url(r'^model', views.ModelView, name='model'),
+    url(r'^aoemodel', views.ModelAoEView, name='aoemodel'),
     url(r'^debug_model', views.ModelDebugView, name='modeldebug'),
     url(r'^scaling', views.ScalingView, name='scale'),
     url(r'^armory_process', views.ArmoryProcessForm, name='armory_process'),
