@@ -112,6 +112,7 @@ def CalcView(request):
   spelltable = []
   meta = None
   totals = None
+  aoetotals = None
   single = []
   if request.method == 'POST':
     form = CalcModelForm(request.POST)
