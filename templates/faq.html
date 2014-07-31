@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+  <div class="container">
+    <h1>FAQ</h1>
+    <p>I haven't actually received any questions yet, but here's a guess at what the common questions are going to be</p>
+    
+    
+    <dl id="faq">
+      <dt>How is spell selection determined?</dt>
+      <dd>
+        Right now the priority rotation is hidden, but I hope to get at least some of it visible in the future.
+        Basically, each spec has a list of conditions that it steps through until it reaches one where all of the
+        conditions are passed. These conditions are based on states, such as whether a buff is active or how much
+        focus you have. If you view the model in debug mode you can see some of these states, conditions, and the
+        largest subsection of states: cooldowns. Once the spell is chosen, I calculate any damage or effects from
+        it, determine if anything else has happened in that time (like a pet attack), and then update all of the
+        cooldowns and states. This process is repeated until the total time passed has passed the set limit.
+      </dd>
+      
+      <dt>Where are options to tweak the rotation in certain cases?</dt>
+      <dd>They're coming.</dd>
+      
+      <dt>What about equipping items, especially for trinkets?</dt>
+      <dd>
+        Also coming, although probably not until they are available on the armory so I can check for consistency.
+        One reason to include items instead of just entering a number for each stat is for unique non-stat
+        behavior, such as on trinkets and set bonuses. Another is because I suspect most people are going to want
+        to import their current character into the app and then tweak it by changing out a couple pieces of
+        actual gear.
+      </dd>
+      
+      <dt>Why are the counts for auto shot and other abilities showing up as "--"?</dt>
+      <dd>
+        I don't actually compute auto shot, pet auto attack, or derivatives (exotic ammunition) on a shot by
+        shot basis. Those shots are completely independent of your spell selection rotation, but are affected
+        by various procs and abilities. One way to model them would be to compute average uptimes of all abilities
+        and calculate auto shot damage based on that. This can run into recursion problems since auto shot may effect
+        some abilities' priorities or strengths but we need ability totals to calculate uptimes.  I opted instead to
+        compute auto shot DPS based on the current states within a special ability block (a row in the model view)
+        and multiply that by the length of that block to get the damage. This isn't perfect as it basically interprets
+        states in discreet packets (quanta!) of special ability blocks, instead of its exact duration, but the
+        blocks are short enough that it shouldn't have much of an effect.        
+      </dd>
+      
+      <dt>What about Serpent Sting?</dt>
+      <dd>
+        The first Arcane Shot or Multi-Shot apply a dot and every time one of these is cast the dot is refreshed.
+        From this I calculate the uptime (almost 100%) and multiply this by DPS of the serpent sting tick (its damage
+        divided by 15). In addition, each Arcane Shot or Multi-Shot do an instant amount of damage equivalent to
+        one tick, or Serpent Sting damage divided by 5. The sum of the instants and dot is multiplied by the number
+        of targets to get the total.
+      </dd>
+      
+      <dt>How is Stampede computed?</dt>
+      <dd>
+        Stampede is tricky because to do it right I'd probably have to model a second pet (multiplied by 4) for its
+        duration, including tracking its focus and all of the various states of things happening. I may do this in
+        the future, but it's fairly complicated and would take awhile to develop. Instead I decided to do the
+        following estimate. Take our regular pet's auto attack and basic damage total and divide by the total time
+        to get average pet DPS. This is multiplied by the duration (20s) to get the damage, multiplied by 4 (since
+        four extra pets are summoned), multiplied by the number of times Stampede was cast.<br/>
+        <kbd>(pet_auto + pet_basic)/time * 20 * 4 * casts</kbd><br/>
+        Again, this is a rough approximation.
+      </dd>
+    </dl>
+  </div>
+{% endblock %}

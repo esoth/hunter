@@ -23,10 +23,6 @@
   color: #000000;
 }
 
-.tab-content div {
-  margin-top: 3px;
-}
-
 .panel-hunter .panel-heading {
   background-image: linear-gradient(to bottom, #3C3C3C 0px, #222222 100%);
   color: #ceff8a;
@@ -67,6 +63,10 @@
 #vertical-banner img {
   margin:auto;
   display:block;
+}
+
+#faq dd {
+  margin-bottom: 2em;
 }
 
 #dps_table td {

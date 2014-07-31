@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+  <div class="container">
+    <h1>About Esoth's WoW Hunter Tools</h1>
+    
+    <p>
+      This site was created partly out of a desire to provide a computational tool that
+      addresses a couple of concerns with existing tools. Broadly speaking, I have seen
+      one type of problem with simulations like SimC and some web apps, and another
+      type of problem with traditional spreadsheets. Let's ignore for a second the
+      spreadsheet vs. sim debate (and questions about the computational power of a
+      spreadsheet).
+    </p>
+    <p>
+      A common problem with the former is black box obfuscation: some calculations
+      are being performed but you don't really know what they are. You insert an input into a
+      black box (i.e. you can't see what's going on inside) and receive an output, but you
+      don't know if it's "correct" or what kind of assumptions they are making. This makes it
+      very difficult for users to identify bugs or run some tests using this modeling as a basis. Some apps literally
+      hide everything. SimC is ostensibly not a black box in that the code is open source, but realistically most
+      users aren't going to be able to identify problems or work around assumptions its making that they don't like
+      without digging through a bunch of C code.
+    </p>
+    <p>
+      Spreadsheets on the other hand are generally pretty good
+      at showing the math behind each calc. You can look at the formula for a given cell, and you might end up
+      having to go through a bunch of them to figure everything out, but it is there. But these have a separate
+      problem: distribution. SimC and spreadsheets both have the problem that even minor changes require an entirely
+      new download (web apps do not have this problem). Additionally with spreadsheets, what if you have a bunch of
+      settings you want to save? You've just required them to download a new copy, so those need to be redone unless
+      you want to try to maintain profile files. Getting those to work across versions greatly increases the work
+      needed to be done.
+    </p>
+    <p>
+      So my goal here was to create a web app that could "show its work" and, by nature of being a web app, always
+      have the user using the newest version. I show my work partly by showing the details of how each stat and in
+      turn how each spell is calculated. Theoretically someone who doesn't know programming could take a look and
+      say "hey, this should/shouldn't use versatility here" without having to know the inner workings of the site.
+      Similarly, the model view shows a shot sequence that the user can look at and see how certain changes actually
+      change the model. I did use to make a spreadsheet awhile back, and there is one additional benefit of making
+      a web app like this instead: using python is way more powerful and easy than trying to do ANYTHING in Visual
+      Basic.
+    </p>
+    
+    <h2>On Spreadsheets vs. Simulations</h2>
+    <p>
+      The general argument between these two approaches is generally that simulations are more accurate, but come
+      at the expense of time. A single simulation is useless, but run it 10000 and you start to see the signal
+      among the noise. The final result, although probabilistic, is something much more precise than a
+      spreadsheet which works with averages. The spreadsheet will give more consistent results (not probabilistic)
+      but they aren't as accurate. But it will give you this slightly rougher result much faster than a sim
+      can give you anything useful.
+    </p>
+    <p>
+      This web app is not a sim and will never be a sim; for purposes of this argument is more along the lines
+      of traditional spreadsheets. It calculates averages - if something has a 20% chance to proc, it will always
+      use the average and assume it procs every 5th time. Basically, the goal of this app is to provide
+      results that enable the user to make useful decisions without needing to get the more precise results of
+      a sim.
+    </p>
+  </div>
+{% endblock %}
