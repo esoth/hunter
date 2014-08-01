@@ -137,6 +137,7 @@ def CalcView(request):
                 {'form': form,
                  'stattable': grouper(stattable),
                  'spelltable': grouper(spelltable),
+                 'spelllist': spelltable,
                  'meta':meta,
                  'totals':totals,
                  'aoetotals':aoetotals,
