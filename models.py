@@ -62,33 +62,50 @@ class ArmoryModel(models.Model):
     spec = models.BooleanField(default=True,
                                verbose_name="Use first spec")
 
+class BMOptionsModel(models.Model):
+    opt_bm1 = models.IntegerField(default=0,
+                         verbose_name="Arcane Shot - min focus (plus cost) to use",
+                         max_length=3)
+    opt_bm2 = models.BooleanField(default=True,
+                         verbose_name="Only use above if shots are < 3s on CD")
+    opt_bm3 = models.BooleanField(default=True,
+                         verbose_name="Hold Bestial Wrath until KC is ready",)
+    opt_bm4 = models.BooleanField(default=False,
+                         verbose_name="Do not cast Dire Beast during Bestial Wrath",)
+    opt_bm5 = models.BooleanField(default=True,
+                         verbose_name="Do not cast Focus Fire during Bestial Wrath",)
+    opt_bm6 = models.BooleanField(default=True,
+                         verbose_name="Cast Focus Fire just before Bestial Wrath",)
+                        
+  
+
 carefulaim_choices=[(0,'Aimed Shot only'),
                     (1,'Aimed Shot and talents (no Chimaera)'),
                     (2,'No restrictions'),
                    ]
 class MMOptionsModel(models.Model):
-    careful = models.IntegerField(default=0,
+    opt_mm1 = models.IntegerField(default=0,
                                verbose_name="Careful Aim behavior",
                                choices=carefulaim_choices,max_length=30)
-    aimedbuffer = models.IntegerField(default=0,
+    opt_mm2 = models.IntegerField(default=0,
                          verbose_name="Aimed Shot - min focus (plus cost) to use",
                          max_length=3)
-    instantwait = models.BooleanField(default=True,
+    opt_mm3 = models.BooleanField(default=True,
                          verbose_name="Only cast instant shots after Focusing Shot")
 
 class SVOptionsModel(models.Model):
-    arcanebuffer = models.IntegerField(default=0,
+    opt_sv1 = models.IntegerField(default=0,
                          verbose_name="Arcane Shot - min focus (plus cost) to use",
                          max_length=3)
-    arcanebuffer2 = models.BooleanField(default=True,
+    opt_sv2 = models.BooleanField(default=True,
                          verbose_name="Only use above if shots are < 3s on CD")
 
-class AoEOptionsModel(models.Model):
-    targets = models.IntegerField(default=0,
+class AOEOptionsModel(models.Model):
+    opt_aoe1 = models.IntegerField(default=8,
                          verbose_name="Targets",
                          max_length=2)
-    nukes = models.BooleanField(default=True,
+    opt_aoe2 = models.BooleanField(default=True,
                          verbose_name="Cast main nukes")
-    nukesbuffer = models.IntegerField(default=0,
+    opt_aoe3 = models.IntegerField(default=0,
                          verbose_name="Min focus (plus cost) to cast main nukes",
                          max_length=3)

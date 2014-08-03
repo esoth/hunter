@@ -15,11 +15,27 @@ from calcs.tools import *
 
 from calcs.execution import dps
 
-from models import HunterModel, ArmoryModel
+from models import *
 
 class CalcModelForm(ModelForm):
     class Meta:
       model = HunterModel
+
+class BMOptionsForm(ModelForm):
+    class Meta:
+      model = BMOptionsModel
+
+class MMOptionsForm(ModelForm):
+    class Meta:
+      model = MMOptionsModel
+
+class SVOptionsForm(ModelForm):
+    class Meta:
+      model = SVOptionsModel
+
+class AOEOptionsForm(ModelForm):
+    class Meta:
+      model = AOEOptionsModel
 
 class ArmoryModelForm(ModelForm):
     class Meta:
@@ -29,7 +45,12 @@ def ModelView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  single,meta,totals = dps.runner(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+  bmo = BMOptionsForm(request.GET)
+  svo = SVOptionsForm(request.GET)
+  mmo = MMOptionsForm(request.GET)
+  aeo = AOEOptionsForm(request.GET)
+  options = processOptions(request,bmo,mmo,svo,aeo)
+  single,meta,totals = dps.runner(hunter,options,lastcalc=float(request.POST.get('lastcalc') or 0))
   
   return render(request, 'hunter/model.html',
                 {'single': single,
@@ -40,7 +61,12 @@ def ModelDebugView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  single,meta,totals = dps.runner(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
+  bmo = BMOptionsForm(request.GET)
+  svo = SVOptionsForm(request.GET)
+  mmo = MMOptionsForm(request.GET)
+  aeo = AOEOptionsForm(request.GET)
+  options = processOptions(request,bmo,mmo,svo,aeo)
+  single,meta,totals = dps.runner(hunter,options,lastcalc=float(request.POST.get('lastcalc') or 0))
   
   return render(request, 'hunter/model.html',
                 {'single': single,
@@ -52,36 +78,17 @@ def ModelAoEView(request):
   form = CalcModelForm(request.GET)
   data = form.data
   meta,hunter = processFormData(data)
-  single,meta,totals = dps.runner(hunter,aoe=int(request.POST.get('aoe') or 8),lastcalc=float(request.POST.get('lastcalc') or 0))
+  bmo = BMOptionsForm(request.GET)
+  svo = SVOptionsForm(request.GET)
+  mmo = MMOptionsForm(request.GET)
+  aeo = AOEOptionsForm(request.GET)
+  options = processOptions(request,bmo,mmo,svo,aeo)
+  single,meta,totals = dps.runner(hunter,options,aoe=True,lastcalc=float(request.POST.get('lastcalc') or 0))
   
   return render(request, 'hunter/model.html',
                 {'single': single,
                  'meta': meta,
                  'totals': totals})
-
-def ScalingView(request):
-  form = CalcModelForm(request.GET)
-  data = form.data
-  meta,hunter = processFormData(data)
-  d = dps.runner(hunter)[-1]['dps']
-  scales = {'agility':[d],'crit':[d],'haste':[d],'mastery':[d],'multistrike':[d],'versatility':[d]}
-  
-  for stat in scales.keys():
-    gearstat = getattr(hunter,stat)
-    start = gearstat.gear()
-    _stat = start
-    for x in range(1,11):
-      _stat = start + x*10
-      gearstat.gear(_stat)
-      scales[stat].append(dps.runner(hunter)[-1]['dps'])
-    gearstat.gear(start)
-  
-  specs = ['Beast Mastery','Marksmanship','Survival']
-  subtitle = specs[meta.spec] + ': ' + ', '.join([TIER4[meta.talent4],TIER5[meta.talent5],TIER6[meta.talent6],TIER7[meta.talent7]])
-  
-  return render(request, 'hunter/scale.html',
-                {'scales':scales,
-                 'subtitle':subtitle})
 
 def processFormData(data):
   meta = HunterMeta()
@@ -91,12 +98,12 @@ def processFormData(data):
   meta.talent5 = int(data['talent5'] or 0)
   meta.talent6 = int(data['talent6'] or 0)
   meta.talent7 = int(data['talent7'] or 0)
-  
+ 
   hunter = Hunter(meta)
   hunter.weaponmin = int(data['weaponmin'])
   hunter.weaponmax = int(data['weaponmax'])
   hunter.weaponspeed = float(data['weaponspeed'])
-  
+ 
   hunter.setgear(agility=int(data['agility']),
                  crit=int(data['crit']),
                  haste=int(data['haste']),
@@ -104,6 +111,24 @@ def processFormData(data):
                  versatility=int(data['versatility']),
                  multistrike=int(data['multistrike']))
   return meta,hunter
+
+def processOptions(request,bmo,mmo,svo,aeo):
+  options = {}
+  options['bm1'] = int(bmo.data['opt_bm1'])
+  options['bm2'] = bmo.data.get('opt_bm2')
+  options['bm3'] = bmo.data.get('opt_bm3')
+  options['bm4'] = bmo.data.get('opt_bm4')
+  options['bm5'] = bmo.data.get('opt_bm5')
+  options['bm6'] = bmo.data.get('opt_bm6')
+  options['mm1'] = int(mmo.data['opt_mm1'])
+  options['mm2'] = int(mmo.data['opt_mm2'])
+  options['mm3'] = mmo.data.get('opt_mm3')
+  options['sv1'] = int(mmo.data['opt_sv1'])
+  options['sv2'] = mmo.data.get('opt_sv2')
+  options['aoe1'] = int(mmo.data['opt_aoe1'])
+  options['aoe2'] = mmo.data.get('opt_aoe2')
+  options['aoe3'] = int(mmo.data['opt_aoe3'])
+  return options
   
 
 def CalcView(request):
@@ -116,6 +141,11 @@ def CalcView(request):
   single = []
   if request.method == 'POST':
     form = CalcModelForm(request.POST)
+    bmo = BMOptionsForm(request.POST)
+    svo = SVOptionsForm(request.POST)
+    mmo = MMOptionsForm(request.POST)
+    aeo = AOEOptionsForm(request.POST)
+    options = processOptions(request,bmo,mmo,svo,aeo)
     if form.is_valid():
       form_data = form.cleaned_data
       meta,hunter = processFormData(form_data)
@@ -124,10 +154,14 @@ def CalcView(request):
       if meta.race != UNDEAD:
         spelltable = [spell for spell in spelltable if spell['name'] != 'Touch of the Grave']
       stattable = hunter.do_stats()
-      single,meta,totals = dps.runner(hunter,lastcalc=float(request.POST.get('lastcalc') or 0))
-      aoe,dummy,aoetotals = dps.runner(hunter,aoe=8)
+      single,meta,totals = dps.runner(hunter,options,lastcalc=float(request.POST.get('lastcalc') or 0))
+      aoe,dummy,aoetotals = dps.runner(hunter,options,aoe=True)
   else:
     form = CalcModelForm()
+    bmo = BMOptionsForm()
+    svo = SVOptionsForm()
+    mmo = MMOptionsForm()
+    aeo = AOEOptionsForm()
   import itertools
   def grouper(iterable):
     args = [iter(iterable)] * 3
@@ -135,6 +169,10 @@ def CalcView(request):
 
   return render(request, 'hunter/calc.html',
                 {'form': form,
+                 'bmo': bmo,
+                 'mmo': mmo,
+                 'svo': svo,
+                 'aeo': aeo,
                  'stattable': grouper(stattable),
                  'spelltable': grouper(spelltable),
                  'spelllist': spelltable,
@@ -142,6 +180,59 @@ def CalcView(request):
                  'totals':totals,
                  'aoetotals':aoetotals,
                  'armory': armory})
+
+def ScaleStatView(request):
+  form = CalcModelForm(request.GET)
+  data = form.data
+  meta,hunter = processFormData(data)
+  bmo = BMOptionsForm(request.GET)
+  svo = SVOptionsForm(request.GET)
+  mmo = MMOptionsForm(request.GET)
+  aeo = AOEOptionsForm(request.GET)
+  options = processOptions(request,bmo,mmo,svo,aeo)
+  d = dps.runner(hunter,options)[-1]['dps']
+  scale = [d]
+  
+  stat = request.GET['stat']
+  gearstat = getattr(hunter,stat)
+  start = gearstat.gear()
+  _stat = start
+  for x in range(1,11):
+    _stat = start + x*10
+    gearstat.gear(_stat)
+    scale.append(dps.runner(hunter,options)[-1]['dps'])
+    
+  return HttpResponse(json.dumps(scale), content_type="application/json")
+  #return json.dumps(scale)
+
+def ScalingView(request):
+  form = CalcModelForm(request.GET)
+  data = form.data
+  meta,hunter = processFormData(data)
+  bmo = BMOptionsForm(request.GET)
+  svo = SVOptionsForm(request.GET)
+  mmo = MMOptionsForm(request.GET)
+  aeo = AOEOptionsForm(request.GET)
+  options = processOptions(request,bmo,mmo,svo,aeo)
+  d = dps.runner(hunter,options)[-1]['dps']
+  scales = {'agility':[d],'crit':[d],'haste':[d],'mastery':[d],'multistrike':[d],'versatility':[d]}
+  
+  for stat in scales.keys():
+    gearstat = getattr(hunter,stat)
+    start = gearstat.gear()
+    _stat = start
+    for x in range(1,11):
+      _stat = start + x*10
+      gearstat.gear(_stat)
+      scales[stat].append(dps.runner(hunter,options)[-1]['dps'])
+    gearstat.gear(start)
+  
+  specs = ['Beast Mastery','Marksmanship','Survival']
+  subtitle = specs[meta.spec] + ': ' + ', '.join([TIER4[meta.talent4],TIER5[meta.talent5],TIER6[meta.talent6],TIER7[meta.talent7]])
+  
+  return render(request, 'hunter/scale.html',
+                {'scales':scales,
+                 'subtitle':subtitle})
 
 def ArmoryProcessForm(request):
   if request.method == 'POST':

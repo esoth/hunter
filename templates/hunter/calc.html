@@ -10,7 +10,7 @@
     <li><a href="#tabs-aoe" data-toggle="tab">AoE</a></li>
     <li><a href="#tabs-scaling" data-toggle="tab">Scaling</a></li>
   </ul>
-  
+
   <div class="tab-content">
     <div class="tab-pane fade in active" id="tabs-input">
       <div class="row">
@@ -19,20 +19,49 @@
           <form action="{% url 'hunter:calc' %}" method="post" id="hunter-form">
             {% csrf_token %}
             <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
-            <table class="table">
-              {{ form.as_table }}
-            </table>
+
+            <ul id="input-tabs" class="nav nav-tabs">
+              <li class="active"><a href="#subtabs-stats" data-toggle="tab">Stats and Talents</a></li>
+              <li><a href="#subtabs-rotation" data-toggle="tab">Rotation options</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="tab-pane fade in active" id="subtabs-stats">
+                <table class="table">
+                  {{ form.as_table }}
+                </table>
+              </div>
+              <div class="tab-pane fade" id="subtabs-rotation">
+                NYI!!!!!!
+                <h3>Beast Master</h3>
+                <table class="table">
+                  {{ bmo.as_table }}
+                </table>
+                <h3>Marksmanship</h3>
+                <table class="table">
+                  {{ mmo.as_table }}
+                </table>
+                <h3>Survival</h3>
+                <table class="table">
+                  {{ svo.as_table }}
+                </table>
+                <h3>AoE</h3>
+                <table class="table">
+                  {{ aeo.as_table }}
+                </table>
+              </div>
+            </div>
             <button type="submit" class="btn btn-success">
               Shoot
               <span class="glyphicon glyphicon-screenshot"></span>
             </button>
           </form>
         </div>
-        
+
         <div class="col-md-2" id="vertical-banner">
           <img class="center" src="{% static "hunter/shoot.png" %}" />
         </div>
-        
+
         <div class="col-md-5">
           <h3>Armory Import:</h3>
           <form action="{% url 'hunter:armory_process' %}" method="post">
@@ -51,7 +80,7 @@
           </form>
         </div>
       </div>
-      
+
       {% if totals %}
         <h3>
           DPS: {{ totals.dps }}
@@ -73,7 +102,7 @@
         </div>
       {% endif %}
     </div>
-          
+
     <div class="tab-pane fade" id="tabs-stats">
       <div class="panel panel-info">
         <div class="panel-heading">
@@ -137,7 +166,7 @@
         </div>
       {% endfor %}
     </div>
-  
+
     <div class="tab-pane fade" id="tabs-spells">
       {% if not spelltable %}
         <div class="panel panel-warning">
@@ -149,12 +178,12 @@
           </div>
         </div>
       {% endif %}
-      
+
       <!-- {% for spell in spelllist %}
         <a href="#{{ spell.id }}">{{ spell.name }}</a>
         {% if not forloop.last %}|{% endif %}
       {% endfor %} -->
-      
+
       {% for spellgroup in spelltable %}
         <div class="row">
           {% for spell in spellgroup %}
@@ -198,7 +227,7 @@
         </div>
       {% endfor %}
     </div>
-    
+
     <div class="tab-pane fade" id="tabs-single">
       {% if totals %}
         <div class="col-lg-13">
@@ -242,10 +271,10 @@
               {% endfor %}
             </table>
           </div>
-            
+
           <div class="col-md-5">
             <div id="container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
-        
+
             <script type="text/javascript">
               $(function () {
                 $('#container').highcharts({
@@ -295,7 +324,7 @@
       <br/>
       <br/>
     </div>
-    
+
     <div class="tab-pane fade" id="tabs-aoe">
       {% if aoetotals %}
         <div class="col-lg-13">
@@ -339,10 +368,10 @@
               {% endfor %}
             </table>
           </div>
-            
+
           <div class="col-md-5">
             <div id="container_aoe" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
-        
+
             <script type="text/javascript">
               $(function () {
                 $('#container_aoe').highcharts({
@@ -392,37 +421,167 @@
       <br/>
       <br/>
     </div>
-    
+
     <div class="tab-pane fade" id="tabs-scaling">
       {% if totals %}
         <div class="container">
           <a href="#" class="btn btn-primary btn-lg" id="full-scale">Scaling</a> -
             compute values for stats
           </a>
-          
+
           <div id="scale-progress" style="display:none; width: 500px">
-            <h3>Loading...</h3>
+            <h3>Loading (this will take awhile)...</h3>
+            <span class="text-muted" id="scale-helper-text">Reticulating splines</span>
             <div class="progress">
-              <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+              <div id="scale-progress-bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100">
                 <span class="sr-only">100% Complete</span>
               </div>
             </div>
           </div>
+          
+          <div id="scale-container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
         </div>
       {% else %}
         <p>Submit the form to calculate</p>
       {% endif %}
     </div>
-    
+
     <script type="text/javascript">
       model_url = "/hunter/model?" + $('#hunter-form').serialize();
       $('#full-model').attr('href',model_url);
       aoemodel_url = "/hunter/aoemodel?" + $('#hunter-form').serialize();
       $('#full-model-aoe').attr('href',aoemodel_url);
-      scale_url = "/hunter/scaling?" + $('#hunter-form').serialize();
-      $('#full-scale').attr('href',scale_url);
-      //$('#full-scale').click(function() {
-      //  $('#scale-progress').show();
+      full_data = []
+      
+      function to_float(arr) {
+        new_arr = []
+        for (i=0;i<arr.length;i++) {
+          new_arr.push(parseFloat(arr[i]))
+        }
+        return new_arr
+      }
+
+      $('#full-scale').click(function() {
+        $('#scale-progress').show();
+        stats = ['agility','crit','haste','mastery','multistrike','versatility']
+
+        scale_url = "/hunter/scalestat?stat=" + stats[0] + "&" + $('#hunter-form').serialize();
+        $.getJSON( scale_url, function( data ) {
+          full_data.push(to_float(data))
+          percent = 1/stats.length*100
+          $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+          $('#scale-progress-bar').css('width',percent.toString()+"%");
+        })
+        .done(function() {
+          $('#scale-helper-text').text('Scrubbing Terrain');
+          scale_url = "/hunter/scalestat?stat=" + stats[1] + "&" + $('#hunter-form').serialize();
+          $.getJSON( scale_url, function( data ) {
+            full_data.push(to_float(data))
+            percent = 2/stats.length*100
+            $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+            $('#scale-progress-bar').css('width',percent.toString()+"%");
+          })
+          .done(function() {
+            $('#scale-helper-text').text('Searching for llamas');
+            scale_url = "/hunter/scalestat?stat=" + stats[2] + "&" + $('#hunter-form').serialize();
+            $.getJSON( scale_url, function( data ) {
+              full_data.push(to_float(data))
+              percent = 3/stats.length*100
+              $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+              $('#scale-progress-bar').css('width',percent.toString()+"%");
+            })
+            .done(function() {
+              $('#scale-helper-text').text('Scrubbing Terrain');
+              scale_url = "/hunter/scalestat?stat=" + stats[3] + "&" + $('#hunter-form').serialize();
+              $.getJSON( scale_url, function( data ) {
+                full_data.push(to_float(data))
+                percent = 4/stats.length*100
+                $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+                $('#scale-progress-bar').css('width',percent.toString()+"%");
+              })
+              .done(function() {
+                $('#scale-helper-text').text('Calculating force parameters');
+                scale_url = "/hunter/scalestat?stat=" + stats[4] + "&" + $('#hunter-form').serialize();
+                $.getJSON( scale_url, function( data ) {
+                  full_data.push(to_float(data))
+                  percent = 5/stats.length*100
+                  $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+                  $('#scale-progress-bar').css('width',percent.toString()+"%");
+                })
+                .done(function() {
+                  $('#scale-helper-text').text('Gesticulating Mimes');
+                  scale_url = "/hunter/scalestat?stat=" + stats[5] + "&" + $('#hunter-form').serialize();
+                  $.getJSON( scale_url, function( data ) {
+                    full_data.push(to_float(data))
+                    percent = 6/stats.length*100
+                    $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+                    $('#scale-progress-bar').css('width',percent.toString()+"%");
+                  })
+                  .done(function() {
+                    $('#scale-progress').hide();
+                    console.log(full_data);
+                    $(function () {
+                      $('#scale-container').highcharts({
+                          title: {
+                              text: 'Hunter Relative Stat Values',
+                              x: -20 //center
+                          },
+                          subtitle: {
+                              text: '{{ subtitle }}',
+                              x: -20
+                          },
+                          xAxis: {
+                              categories: [0,10,20,30,40,50,60,70,80,90,100]
+                          },
+                          yAxis: {
+                              title: {
+                                  text: 'DPS'
+                              },
+                              plotLines: [{
+                                  value: 0,
+                                  width: 1,
+                                  color: '#808080'
+                              }]
+                          },
+                          tooltip: {
+                              valueSuffix: ' DPS'
+                          },
+                          legend: {
+                              layout: 'vertical',
+                              align: 'right',
+                              verticalAlign: 'middle',
+                              borderWidth: 0
+                          },
+                          series: [{
+                              name: 'Agility',
+                              data: full_data[0]
+                          }, {
+                              name: 'Crit',
+                              data: full_data[1]
+                          }, {
+                              name: 'Haste',
+                              data: full_data[2]
+                          }, {
+                              name: 'Mastery',
+                              data: full_data[3]
+                          }, {
+                              name: 'Multistrike',
+                              data: full_data[4]
+                          }, {
+                              name: 'Versatility',
+                              data: full_data[5]
+                          }]
+                      });
+                    });
+                    
+                    
+                  });
+                })
+              })
+            })
+          });
+        });
+      });
       //  $('#tabs-scaling .container').load( scale_url + ' #model' );
       function rename_talent7() {
         if ($('#id_spec').val() == "0") {
@@ -432,7 +591,7 @@
           $('#id_talent7 option:last').text('Lone Wolf');
         };
       };
-      
+
       $('#id_spec').change(function() {
         rename_talent7();
       });
