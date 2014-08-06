@@ -114,16 +114,16 @@ def processFormData(data):
 
 def processOptions(request,bmo,mmo,svo,aeo):
   options = {}
-  options['bm3'] = bmo.data.get('opt_bm3')
-  options['bm4'] = bmo.data.get('opt_bm4')
-  options['bm5'] = bmo.data.get('opt_bm5')
-  options['bm6'] = bmo.data.get('opt_bm6')
-  options['mm1'] = int(mmo.data['opt_mm1'])
-  options['mm2'] = int(mmo.data['opt_mm2'])
-  options['mm3'] = mmo.data.get('opt_mm3')
-  options['aoe1'] = int(mmo.data['opt_aoe1'])
-  options['aoe2'] = mmo.data.get('opt_aoe2')
-  options['aoe3'] = int(mmo.data['opt_aoe3'])
+  options['bm3'] = bmo.data.get('opt_bm3',False)
+  options['bm4'] = bmo.data.get('opt_bm4',False)
+  options['bm5'] = bmo.data.get('opt_bm5',False)
+  options['bm6'] = bmo.data.get('opt_bm6',False)
+  options['mm1'] = int(mmo.data.get('opt_mm1',0))
+  options['mm2'] = int(mmo.data.get('opt_mm2',0))
+  options['mm3'] = mmo.data.get('opt_mm3',False)
+  options['aoe1'] = int(mmo.data.get('opt_aoe1',0))
+  options['aoe2'] = mmo.data.get('opt_aoe2',False)
+  options['aoe3'] = int(mmo.data.get('opt_aoe3',0))
   return options
   
 
