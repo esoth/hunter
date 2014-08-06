@@ -463,6 +463,9 @@
 
       $('#full-scale').click(function() {
         $('#scale-progress').show();
+        $('#scale-container').text('');
+        $('#scale-progress-bar').attr('aria-valuenow','2');
+        $('#scale-progress-bar').css('width','2%');
         stats = ['agility','crit','haste','mastery','multistrike','versatility']
 
         scale_url = "/hunter/scalestat?stat=" + stats[0] + "&" + $('#hunter-form').serialize();
@@ -473,7 +476,7 @@
           $('#scale-progress-bar').css('width',percent.toString()+"%");
         })
         .done(function() {
-          $('#scale-helper-text').text('Scrubbing Terrain');
+          $('#scale-helper-text').text('Integrating curves');
           scale_url = "/hunter/scalestat?stat=" + stats[1] + "&" + $('#hunter-form').serialize();
           $.getJSON( scale_url, function( data ) {
             full_data.push(to_float(data))
@@ -482,7 +485,7 @@
             $('#scale-progress-bar').css('width',percent.toString()+"%");
           })
           .done(function() {
-            $('#scale-helper-text').text('Searching for llamas');
+            $('#scale-helper-text').text('Extracting Resources');
             scale_url = "/hunter/scalestat?stat=" + stats[2] + "&" + $('#hunter-form').serialize();
             $.getJSON( scale_url, function( data ) {
               full_data.push(to_float(data))
@@ -509,7 +512,7 @@
                   $('#scale-progress-bar').css('width',percent.toString()+"%");
                 })
                 .done(function() {
-                  $('#scale-helper-text').text('Gesticulating Mimes');
+                  $('#scale-helper-text').text('Perturbing Matrices');
                   scale_url = "/hunter/scalestat?stat=" + stats[5] + "&" + $('#hunter-form').serialize();
                   $.getJSON( scale_url, function( data ) {
                     full_data.push(to_float(data))
@@ -531,7 +534,7 @@
                               x: -20
                           },
                           xAxis: {
-                              categories: [0,10,20,30,40,50,60,70,80,90,100]
+                              categories: [0,100,200,300,400,500,600,700,800,900,1000]
                           },
                           yAxis: {
                               title: {

@@ -63,11 +63,6 @@ class ArmoryModel(models.Model):
                                verbose_name="Use first spec")
 
 class BMOptionsModel(models.Model):
-    opt_bm1 = models.IntegerField(default=0,
-                         verbose_name="Arcane Shot - min focus (plus cost) to use",
-                         max_length=3)
-    opt_bm2 = models.BooleanField(default=True,
-                         verbose_name="Only use above if shots are < 3s on CD")
     opt_bm3 = models.BooleanField(default=True,
                          verbose_name="Hold Bestial Wrath until KC is ready",)
     opt_bm4 = models.BooleanField(default=False,
@@ -94,11 +89,8 @@ class MMOptionsModel(models.Model):
                          verbose_name="Only cast instant shots after Focusing Shot")
 
 class SVOptionsModel(models.Model):
-    opt_sv1 = models.IntegerField(default=0,
-                         verbose_name="Arcane Shot - min focus (plus cost) to use",
-                         max_length=3)
     opt_sv2 = models.BooleanField(default=True,
-                         verbose_name="Only use above if shots are < 3s on CD")
+                         verbose_name="Null action - place holder")
 
 class AOEOptionsModel(models.Model):
     opt_aoe1 = models.IntegerField(default=8,

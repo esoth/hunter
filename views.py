@@ -114,8 +114,6 @@ def processFormData(data):
 
 def processOptions(request,bmo,mmo,svo,aeo):
   options = {}
-  options['bm1'] = int(bmo.data['opt_bm1'])
-  options['bm2'] = bmo.data.get('opt_bm2')
   options['bm3'] = bmo.data.get('opt_bm3')
   options['bm4'] = bmo.data.get('opt_bm4')
   options['bm5'] = bmo.data.get('opt_bm5')
@@ -123,8 +121,6 @@ def processOptions(request,bmo,mmo,svo,aeo):
   options['mm1'] = int(mmo.data['opt_mm1'])
   options['mm2'] = int(mmo.data['opt_mm2'])
   options['mm3'] = mmo.data.get('opt_mm3')
-  options['sv1'] = int(mmo.data['opt_sv1'])
-  options['sv2'] = mmo.data.get('opt_sv2')
   options['aoe1'] = int(mmo.data['opt_aoe1'])
   options['aoe2'] = mmo.data.get('opt_aoe2')
   options['aoe3'] = int(mmo.data['opt_aoe3'])
@@ -198,7 +194,7 @@ def ScaleStatView(request):
   start = gearstat.gear()
   _stat = start
   for x in range(1,11):
-    _stat = start + x*10
+    _stat = start + x*100
     gearstat.gear(_stat)
     scale.append(dps.runner(hunter,options)[-1]['dps'])
     
