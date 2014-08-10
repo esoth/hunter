@@ -99,5 +99,5 @@ class AOEOptionsModel(models.Model):
     opt_aoe2 = models.BooleanField(default=True,
                          verbose_name="Cast main nukes")
     opt_aoe3 = models.IntegerField(default=0,
-                         verbose_name="Min focus (plus cost) to cast main nukes",
+                         verbose_name="Min focus to cast main nukes",
                          max_length=3)
