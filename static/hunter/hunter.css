@@ -9,6 +9,37 @@
   color: #ABD473;
 }
 
+#item-banner {
+  background-color: #242424;
+  padding: 0.25em;
+}
+
+#items-table td {
+  background-color: #242424;
+  padding: 0.25em 0.5em;
+  color: white;
+}
+
+#item-banner .item-quality3,
+#items-table a .item-quality3 {
+  color: #0070DD;
+}
+
+#item-banner .item-quality4,
+#items-table a .item-quality4 {
+  color: #a335ee;
+}
+
+#item-banner .item-quality5,
+#items-table a .item-quality5 {
+  color: #FF8004;
+}
+
+.nameDescription {
+  color: #00FF00;
+  font-size: 80%;
+}
+
 #dps_title, #dps {
   font-weight: 500;
   font-size: 24px;
