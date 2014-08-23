@@ -449,9 +449,9 @@
     </div>
 
     <script type="text/javascript">
-      model_url = "/hunter/model?" + $('#hunter-form').serialize();
+      model_url = "{% url "hunter:model" %}?" + $('#hunter-form').serialize();
       $('#full-model').attr('href',model_url);
-      aoemodel_url = "/hunter/aoemodel?" + $('#hunter-form').serialize();
+      aoemodel_url = "{% url "hunter:aoemodel" %}?" + $('#hunter-form').serialize();
       $('#full-model-aoe').attr('href',aoemodel_url);
       full_data = []
       
@@ -469,8 +469,9 @@
         $('#scale-progress-bar').attr('aria-valuenow','2');
         $('#scale-progress-bar').css('width','2%');
         stats = ['agility','crit','haste','mastery','multistrike','versatility']
+        scale_url_base = "{% url "hunter:scalestat" %}?stat="
 
-        scale_url = "/hunter/scalestat?stat=" + stats[0] + "&" + $('#hunter-form').serialize();
+        scale_url = scale_url_base + stats[0] + "&" + $('#hunter-form').serialize();
         $.getJSON( scale_url, function( data ) {
           full_data.push(to_float(data))
           percent = 1/stats.length*100
@@ -479,7 +480,7 @@
         })
         .done(function() {
           $('#scale-helper-text').text('Integrating curves');
-          scale_url = "/hunter/scalestat?stat=" + stats[1] + "&" + $('#hunter-form').serialize();
+          scale_url = scale_url_base + stats[1] + "&" + $('#hunter-form').serialize();
           $.getJSON( scale_url, function( data ) {
             full_data.push(to_float(data))
             percent = 2/stats.length*100
@@ -488,7 +489,7 @@
           })
           .done(function() {
             $('#scale-helper-text').text('Extracting Resources');
-            scale_url = "/hunter/scalestat?stat=" + stats[2] + "&" + $('#hunter-form').serialize();
+            scale_url = scale_url_base + stats[2] + "&" + $('#hunter-form').serialize();
             $.getJSON( scale_url, function( data ) {
               full_data.push(to_float(data))
               percent = 3/stats.length*100
@@ -497,7 +498,7 @@
             })
             .done(function() {
               $('#scale-helper-text').text('Scrubbing Terrain');
-              scale_url = "/hunter/scalestat?stat=" + stats[3] + "&" + $('#hunter-form').serialize();
+              scale_url = scale_url_base + stats[3] + "&" + $('#hunter-form').serialize();
               $.getJSON( scale_url, function( data ) {
                 full_data.push(to_float(data))
                 percent = 4/stats.length*100
@@ -506,7 +507,7 @@
               })
               .done(function() {
                 $('#scale-helper-text').text('Calculating force parameters');
-                scale_url = "/hunter/scalestat?stat=" + stats[4] + "&" + $('#hunter-form').serialize();
+                scale_url = scale_url_base + stats[4] + "&" + $('#hunter-form').serialize();
                 $.getJSON( scale_url, function( data ) {
                   full_data.push(to_float(data))
                   percent = 5/stats.length*100
@@ -515,7 +516,7 @@
                 })
                 .done(function() {
                   $('#scale-helper-text').text('Perturbing Matrices');
-                  scale_url = "/hunter/scalestat?stat=" + stats[5] + "&" + $('#hunter-form').serialize();
+                  scale_url = scale_url_base + stats[5] + "&" + $('#hunter-form').serialize();
                   $.getJSON( scale_url, function( data ) {
                     full_data.push(to_float(data))
                     percent = 6/stats.length*100

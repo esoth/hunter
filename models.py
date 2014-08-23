@@ -44,8 +44,8 @@ class HunterModel(models.Model):
     talent7 = models.IntegerField(default=tier7[0],
                                verbose_name="Talents - level 100",
                                choices=tier7,max_length=30)
-    agility = models.IntegerField(default=2377) #21406)
-    crit = models.IntegerField(default=1052)
+    agility = models.IntegerField(default=2378) #21406)
+    crit = models.IntegerField(default=1028)
     haste = models.IntegerField(default=748)
     mastery = models.IntegerField(default=737)
     multistrike = models.IntegerField(default=506)

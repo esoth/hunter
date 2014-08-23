@@ -127,7 +127,7 @@ def processOptions(request,bmo,mmo,svo,aeo):
   return options
   
 
-def CalcView(request,armory=False):
+def CalcView(request,from_armory=False):
   armory = ArmoryModelForm()
   stattable = []
   spelltable = []
@@ -137,7 +137,7 @@ def CalcView(request,armory=False):
   single = []
   if request.method == 'POST':
     form = CalcModelForm(request.POST)
-    if armory:
+    if from_armory:
       bmo = BMOptionsForm()
       svo = SVOptionsForm()
       mmo = MMOptionsForm()
@@ -285,4 +285,4 @@ def ArmoryView(request, region, server, character, spec=None):
   request.POST['weaponmin'] = squish(data['items']['mainHand']['weaponInfo']['damage']['min'])/2
   request.POST['weaponmax'] = squish(data['items']['mainHand']['weaponInfo']['damage']['max'])/2
   request.POST['weaponspeed'] = data['items']['mainHand']['weaponInfo']['weaponSpeed']
-  return CalcView(request,armory=True)
+  return CalcView(request,from_armory=True)

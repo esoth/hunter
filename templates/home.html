@@ -2,12 +2,24 @@
 {% load staticfiles %}
 
 {% block content %}
-
-    To do:
-    <ul>
-      <li>ITEMS!</li>
-      <li>Procs, especially trinkets</li>
-      <li>Potions</li>
-      <li>Add latency</li>
-    </ul>
+  <div class="container">
+    <h1>Welcome to Esoth's Hunter Tools!</h1>
+    
+    <p>Head over to the <a href="{% url "hunter:calc" %}">Calculator</a> to compute DPS and generate some statistical analysis. Right now selecting
+      equipped gear is not supported, but I hope to support it in the future (unfortunately it may have to wait until after launch
+      when I can see how it comes in from the WoW Web API).
+    </p>
+    
+    <p>Gear stats should be entered from gear only - not specialization attunements, mail specialization, or base stats. This will be
+      computed separately.
+    </p>
+    
+    <p>Until the expansion hits, you are probably better off using the default stat values, which should match the starter gear for
+      premade level 100s.
+    </p>
+    
+    <p>Visit the <a href="{% url "changelog" %}">change log</a> for the latest changes.</p>
+    
+    <p>Happy hunting!</p>
+  </div>
 {% endblock %}
