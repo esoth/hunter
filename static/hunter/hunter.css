@@ -256,3 +256,16 @@ td.a-murder-of-crows_rotation {
   font-size: 85%;
   color: #999999;
 }
+
+#sockets {
+  width: 200px;
+  list-style-type: none;
+  color: #999999;
+  background-color: #070C21;
+  padding-left: 0.5em;
+}
+
+#sockets li {
+  padding-top:0.25em;
+  padding-bottom:0.25em;
+}  
