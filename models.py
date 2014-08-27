@@ -125,7 +125,10 @@ trinket_slots = slot_maker(12)
 weapon_slots = slot_maker(15)
 
 
-gem_choices = [('','(None)')]+[(g,g) for g in Gem.objects.all().order_by('name')]
+try:
+  gem_choices = [('','(None)')]+[(g,g) for g in Gem.objects.all().order_by('name')]
+except:
+  gem_choices = [('','(None)')]
 
 class GearEquipModel(models.Model):
     weapon = models.CharField(choices=weapon_slots,

@@ -309,13 +309,16 @@ def GearTableView(request):
                  'socket2':g.socket2,
                  'socket3':g.socket3,
                  'socket_bonus':g.socket_bonus}
-  for g in Gem.objects.all():
-    gear_table[g.name] = {'agility':g.agility,
-         'crit':g.crit,
-         'haste':g.haste,
-         'mastery':g.mastery,
-         'multistrike':g.multistrike,
-         'versatility':g.versatility}
+  try:
+    for g in Gem.objects.all():
+      gear_table[g.name] = {'agility':g.agility,
+           'crit':g.crit,
+           'haste':g.haste,
+           'mastery':g.mastery,
+           'multistrike':g.multistrike,
+           'versatility':g.versatility}
+  except:
+    pass
   return HttpResponse(json.dumps(gear_table), mimetype='application/json')
 
 
