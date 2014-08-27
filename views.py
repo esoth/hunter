@@ -16,6 +16,7 @@ from calcs.tools import *
 from calcs.execution import dps
 
 from models import *
+from gearitem.models import GearItem, Gem
 
 class CalcModelForm(ModelForm):
     class Meta:
@@ -40,6 +41,10 @@ class AOEOptionsForm(ModelForm):
 class ArmoryModelForm(ModelForm):
     class Meta:
       model = ArmoryModel
+
+class GearEquipModelForm(ModelForm):
+    class Meta:
+      model = GearEquipModel
 
 def ModelView(request):
   form = CalcModelForm(request.GET)
@@ -286,3 +291,41 @@ def ArmoryView(request, region, server, character, spec=None):
   request.POST['weaponmax'] = squish(data['items']['mainHand']['weaponInfo']['damage']['max'])/2
   request.POST['weaponspeed'] = data['items']['mainHand']['weaponInfo']['weaponSpeed']
   return CalcView(request,from_armory=True)
+  
+def GearTableView(request):
+  gear_table = {'':{'source':'','agility':'','crit':'','haste':'','mastery':'','multistrike':'','versatility':'','zone':'','source':''}}
+  for g in GearItem.objects.all():
+    gear_table[g.name + ' (' + (g.nameDescription or 'normal') + ')'] = {'zone':g.zone,
+                 'source':g.source,
+                 'agility':g.agility,
+                 'crit':g.crit,
+                 'haste':g.haste,
+                 'mastery':g.mastery,
+                 'multistrike':g.multistrike,
+                 'versatility':g.versatility,
+                 'zone':g.zone,
+                 'source':g.source,
+                 'socket1':g.socket1,
+                 'socket2':g.socket2,
+                 'socket3':g.socket3,
+                 'socket_bonus':g.socket_bonus}
+  for g in Gem.objects.all():
+    gear_table[g.name] = {'agility':g.agility,
+         'crit':g.crit,
+         'haste':g.haste,
+         'mastery':g.mastery,
+         'multistrike':g.multistrike,
+         'versatility':g.versatility}
+  return HttpResponse(json.dumps(gear_table), mimetype='application/json')
+
+
+def GearEquipTestView(request):
+  form = GearEquipModelForm()
+  slots = []
+  for s in ('weapon','head','neck','shoulders','back','chest','wrists','hands','waist','legs','feet','ring1','ring2','trinket1','trinket2',):
+    slots.append({'id':s,'name':s[0].upper()+s[1:]+':','small':False,'form':form[s]})
+    slots.append({'id':s+'_socket1','name':'Socket 1','small':True,'form':form[s+'_socket1']})
+  
+  return render(request, 'hunter/geartest.html',
+                {'form': form,
+                 'slots': slots})

@@ -1,4 +1,5 @@
 from django.db import models
+from gearitem.models import GearItem, Gem
 
 from calcs.tools import RACES, SPECS, REGIONS, SERVERS, TIER1, TIER2, TIER3, TIER4, TIER5, TIER6, TIER7
 
@@ -101,3 +102,119 @@ class AOEOptionsModel(models.Model):
     opt_aoe3 = models.IntegerField(default=0,
                          verbose_name="Min focus to cast main nukes",
                          max_length=3)
+
+
+def slot_maker(slot):
+  itms = GearItem.objects.filter(slot=slot).order_by('name')
+  options = [('','(None equipped)')]
+  options.extend([(itm,itm) for itm in itms])
+  return options
+  
+head_slots = slot_maker(1)
+neck_slots = slot_maker(2)
+shoulder_slots = slot_maker(3)
+back_slots = slot_maker(16)
+chest_slots = slot_maker(5)
+wrists_slots = slot_maker(9)
+hands_slots = slot_maker(10)
+waist_slots = slot_maker(6)
+legs_slots = slot_maker(7)
+feet_slots = slot_maker(8)
+ring_slots = slot_maker(11)
+trinket_slots = slot_maker(12)
+weapon_slots = slot_maker(15)
+
+
+gem_choices = [('','(None)')]+[(g,g) for g in Gem.objects.all().order_by('name')]
+
+class GearEquipModel(models.Model):
+    weapon = models.CharField(choices=weapon_slots,
+                            default='',
+                            max_length=30)
+    weapon_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    head = models.CharField(choices=head_slots,
+                            default='',
+                            max_length=30)
+    head_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    neck = models.CharField(choices=neck_slots,
+                            default='',
+                            max_length=30)
+    neck_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    shoulders = models.CharField(choices=shoulder_slots,
+                            default='',
+                            max_length=30)
+    shoulders_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    back = models.CharField(choices=back_slots,
+                            default='',
+                            max_length=30)
+    back_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    chest = models.CharField(choices=chest_slots,
+                            default='',
+                            max_length=30)
+    chest_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    wrists = models.CharField(choices=wrists_slots,
+                            default='',
+                            max_length=30)
+    wrists_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    hands = models.CharField(choices=hands_slots,
+                            default='',
+                            max_length=30)
+    hands_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    waist = models.CharField(choices=waist_slots,
+                            default='',
+                            max_length=30)
+    waist_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    legs = models.CharField(choices=legs_slots,
+                            default='',
+                            max_length=30)
+    legs_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    feet = models.CharField(choices=feet_slots,
+                            default='',
+                            max_length=30)
+    feet_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    ring1 = models.CharField(choices=ring_slots,
+                            default='',
+                            max_length=30)
+    ring1_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    ring2 = models.CharField(choices=ring_slots,
+                            default='',
+                            max_length=30)
+    ring2_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    trinket1 = models.CharField(choices=trinket_slots,
+                            default='',
+                            max_length=30)
+    trinket1_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    trinket2 = models.CharField(choices=trinket_slots,
+                            default='',
+                            max_length=30)
+    trinket2_socket1 = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
