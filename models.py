@@ -80,7 +80,7 @@ carefulaim_choices=[(0,'Aimed Shot only'),
                     (2,'No restrictions'),
                    ]
 class MMOptionsModel(models.Model):
-    opt_mm1 = models.IntegerField(default=0,
+    opt_mm1 = models.IntegerField(default=2,
                                verbose_name="Careful Aim behavior",
                                choices=carefulaim_choices,max_length=30)
     opt_mm2 = models.IntegerField(default=0,
