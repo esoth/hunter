@@ -250,11 +250,23 @@ def ArmoryProcessForm(request):
     return redirect('/hunter/')
   else:
     return redirect('/hunter/')
-  
+
+def build_item(slot):
+  from gearitem.tools import stats_used
+  attrs = {}
+  for stat in slot['stats']:
+    if stat['stat'] in stats_used:
+      attrs[stats_used[stat['stat']]] = stat['amount']
+  if 'gem1' in slot['tooltipParams']:
+    attrs['gem'] = slot['tooltipParams']['gem1']
+  attrs['id'] = slot['id']
+  attrs['name'] = slot['name']
+  attrs['ilvl'] = slot['itemLevel']
+  return attrs
 
 def ArmoryView(request, region, server, character, spec=None):
-  kwargs = {'region':region,'server':server,'character':character}
-  url = 'http://%(region)s.battle.net/api/wow/character/%(server)s/%(character)s?fields=stats,talents,items' % kwargs
+  kwargs = {'region':region,'server':server,'character':character,'apikey':API_KEY}
+  url = 'https://%(region)s.api.battle.net/wow/character/%(server)s/%(character)s?apikey=%(apikey)s&fields=stats,talents,items' % kwargs
   data = json.load(urlopen(url))
   
   try:
@@ -285,6 +297,23 @@ def ArmoryView(request, region, server, character, spec=None):
   request.POST['mastery'] = squish(data['stats']['masteryRating'])
   request.POST['versatility'] = 0
   request.POST['multistrike'] = 0
+  
+  # items
+  head = build_item(data['items']['head'])
+  neck = build_item(data['items']['neck'])
+  shoulders = build_item(data['items']['shoulder'])
+  chest = build_item(data['items']['chest'])
+  back = build_item(data['items']['back'])
+  wrists = build_item(data['items']['wrist'])
+  hands = build_item(data['items']['hands'])
+  waist = build_item(data['items']['waist'])
+  legs = build_item(data['items']['legs'])
+  feet = build_item(data['items']['feet'])
+  ring1 = build_item(data['items']['finger1'])
+  ring2 = build_item(data['items']['finger2'])
+  trinket1 = build_item(data['items']['trinket1'])
+  trinket2 = build_item(data['items']['trinket2'])
+  
   request.POST['race'] = data['race']
   request.POST['spec'] = data['talents'][spec]['spec']['order']
   request.POST['weaponmin'] = squish(data['items']['mainHand']['weaponInfo']['damage']['min'])/2
@@ -325,6 +354,7 @@ def GearTableView(request):
 def GearEquipTestView(request):
   form = GearEquipModelForm()
   slots = []
+  
   for s in ('weapon','head','neck','shoulders','back','chest','wrists','hands','waist','legs','feet','ring1','ring2','trinket1','trinket2',):
     slots.append({'id':s,'name':s[0].upper()+s[1:]+':','small':False,'form':form[s]})
     slots.append({'id':s+'_socket1','name':'Socket 1','small':True,'form':form[s+'_socket1']})
@@ -332,3 +362,39 @@ def GearEquipTestView(request):
   return render(request, 'hunter/geartest.html',
                 {'form': form,
                  'slots': slots})
+
+def GearEquipTestView2(request):
+  form = GearEquipModelForm()
+  slots = []
+  
+  data = json.load(urlopen('https://us.api.battle.net/wow/character/whisperwind/esoth?apikey=%s&fields=stats,talents,items' % API_KEY))
+  
+  armory = {'head':build_item(data['items']['head']),
+            'neck':build_item(data['items']['neck']),
+            'shoulders':build_item(data['items']['shoulder']),
+            'chest':build_item(data['items']['chest']),
+            'back':build_item(data['items']['back']),
+            'wrists':build_item(data['items']['wrist']),
+            'hands':build_item(data['items']['hands']),
+            'waist':build_item(data['items']['waist']),
+            'legs':build_item(data['items']['legs']),
+            'feet':build_item(data['items']['feet']),
+            'ring1':build_item(data['items']['finger1']),
+            'ring2':build_item(data['items']['finger2']),
+            'trinket1':build_item(data['items']['trinket1']),
+            'trinket2':build_item(data['items']['trinket2'])}
+
+  for slot,attrs in armory.items():
+    slots.append({'id':attrs['id'],
+                  'agility':attrs.get('agility',0),
+                  'crit':attrs.get('crit',0),
+                  'haste':attrs.get('haste',0),
+                  'mastery':attrs.get('mastery',0),
+                  'multistrike':attrs.get('multistrike',0),
+                  'versatility':attrs.get('versatility',0),
+                  'name':attrs.get('name',0),
+                  'ilvl':attrs.get('ilvl',0),
+      })
+  
+  return render(request, 'hunter/geartest2.html',
+                {'slots': slots})
