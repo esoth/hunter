@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.utils import OperationalError
 from gearitem.models import GearItem, Gem
 
 from calcs.tools import RACES, SPECS, REGIONS, SERVERS, TIER1, TIER2, TIER3, TIER4, TIER5, TIER6, TIER7
@@ -104,11 +105,14 @@ class AOEOptionsModel(models.Model):
                          max_length=3)
 
 
-def slot_maker(slot):
-  itms = GearItem.objects.filter(slot=slot).order_by('name')
-  options = [('','(None equipped)')]
-  options.extend([(itm,itm) for itm in itms])
-  return options
+def slot_maker(*args):
+  try:
+    itms = GearItem.objects.filter(slot__in=args).order_by('name')
+    options = [('','(None equipped)')]
+    options.extend([(itm,itm) for itm in itms])
+    return options
+  except OperationalError: # if table doesn't exist yet
+    return []
   
 head_slots = slot_maker(1)
 neck_slots = slot_maker(2)
@@ -122,11 +126,15 @@ legs_slots = slot_maker(7)
 feet_slots = slot_maker(8)
 ring_slots = slot_maker(11)
 trinket_slots = slot_maker(12)
-weapon_slots = slot_maker(15)
+weapon_slots = slot_maker(15,26)
+
+difficulty_options = (('normal','Normal/None'),
+                      ('heroic','Heroic'),
+                      ('mythic','Mythic'),)
 
 
 try:
-  gem_choices = [('','(None)')]+[(g,g) for g in Gem.objects.all().order_by('name')]
+  gem_choices = [('','(None)')]+[(g.id,g.name) for g in Gem.objects.all().order_by('id')]
 except:
   gem_choices = [('','(None)')]
 
@@ -134,90 +142,164 @@ class GearEquipModel(models.Model):
     weapon = models.CharField(choices=weapon_slots,
                             default='',
                             max_length=30)
-    weapon_socket1 = models.CharField(choices=gem_choices,
+    weapon_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    weapon_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    weapon_warforged = models.BooleanField(default=False,)
+
     head = models.CharField(choices=head_slots,
                             default='',
                             max_length=30)
-    head_socket1 = models.CharField(choices=gem_choices,
+    head_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    head_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    head_warforged = models.BooleanField(default=False,)
+
     neck = models.CharField(choices=neck_slots,
                             default='',
                             max_length=30)
-    neck_socket1 = models.CharField(choices=gem_choices,
+    neck_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    neck_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    neck_warforged = models.BooleanField(default=False,)
+
     shoulders = models.CharField(choices=shoulder_slots,
                             default='',
                             max_length=30)
-    shoulders_socket1 = models.CharField(choices=gem_choices,
+    shoulders_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    shoulders_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    shoulders_warforged = models.BooleanField(default=False,)
+
     back = models.CharField(choices=back_slots,
                             default='',
                             max_length=30)
-    back_socket1 = models.CharField(choices=gem_choices,
+    back_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    back_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    back_warforged = models.BooleanField(default=False,)
+
     chest = models.CharField(choices=chest_slots,
                             default='',
                             max_length=30)
-    chest_socket1 = models.CharField(choices=gem_choices,
+    chest_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    chest_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    chest_warforged = models.BooleanField(default=False,)
+
     wrists = models.CharField(choices=wrists_slots,
                             default='',
                             max_length=30)
-    wrists_socket1 = models.CharField(choices=gem_choices,
+    wrists_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    wrists_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    wrists_warforged = models.BooleanField(default=False,)
+
     hands = models.CharField(choices=hands_slots,
                             default='',
                             max_length=30)
-    hands_socket1 = models.CharField(choices=gem_choices,
+    hands_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    hands_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    hands_warforged = models.BooleanField(default=False,)
+
     waist = models.CharField(choices=waist_slots,
                             default='',
                             max_length=30)
-    waist_socket1 = models.CharField(choices=gem_choices,
+    waist_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    waist_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    waist_warforged = models.BooleanField(default=False,)
+
     legs = models.CharField(choices=legs_slots,
                             default='',
                             max_length=30)
-    legs_socket1 = models.CharField(choices=gem_choices,
+    legs_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    legs_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    legs_warforged = models.BooleanField(default=False,)
+
     feet = models.CharField(choices=feet_slots,
                             default='',
                             max_length=30)
-    feet_socket1 = models.CharField(choices=gem_choices,
+    feet_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    feet_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    feet_warforged = models.BooleanField(default=False,)
+
     ring1 = models.CharField(choices=ring_slots,
                             default='',
                             max_length=30)
-    ring1_socket1 = models.CharField(choices=gem_choices,
+    ring1_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    ring1_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    ring1_warforged = models.BooleanField(default=False,)
+
     ring2 = models.CharField(choices=ring_slots,
                             default='',
                             max_length=30)
-    ring2_socket1 = models.CharField(choices=gem_choices,
+    ring2_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    ring2_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    ring2_warforged = models.BooleanField(default=False,)
+
     trinket1 = models.CharField(choices=trinket_slots,
                             default='',
                             max_length=30)
-    trinket1_socket1 = models.CharField(choices=gem_choices,
+    trinket1_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    trinket1_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    trinket1_warforged = models.BooleanField(default=False,)
+
     trinket2 = models.CharField(choices=trinket_slots,
                             default='',
                             max_length=30)
-    trinket2_socket1 = models.CharField(choices=gem_choices,
+    trinket2_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
+    trinket2_socket = models.CharField(choices=gem_choices,
+                            default='',
+                            max_length=30)
+    trinket2_warforged = models.BooleanField(default=False,)
