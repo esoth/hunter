@@ -1,0 +1,54 @@
+{% load staticfiles %}
+{% if not spelltable %}
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">Warning</h3>
+    </div>
+    <div class="panel-body">
+      Results not yet calculated - click the "Calculate" button
+    </div>
+  </div>
+{% endif %}
+
+{% for spellgroup in spelltable %}
+  <div class="row">
+    {% for spell in spellgroup %}
+      {% if spell %}
+        <div class="col-sm-4">
+          <div class="panel-hunter panel">
+            <div class="panel-heading">
+              <h3 id="{{ spell.id }}" class="panel-title">{{ spell.name }}</h3>
+            </div>
+            <div class="panel-body">
+              <table class="table">
+                {% for attr in spell.attributes %}
+                  {% if attr.value %}
+                    <tr class="{{ attr.klass }}">
+                      <th>
+                        {% if attr.description %}
+                          <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                            title="{{ attr.description }}">
+                            {{ attr.title }}
+                          </a>
+                        {% else %}
+                          {{ attr.title }}
+                        {% endif %}
+                      </th>
+                      <td>
+                        {% if attr.title == 'Damage' %}
+                           <span class="badge">{{ attr.value }}</span>
+                        {% else %}
+                           {{ attr.value }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endfor %}

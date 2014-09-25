@@ -4,6 +4,22 @@
   margin: 40px 40px 0 40px;
 }
 
+#subtabs {
+  padding: 0.5em;
+  border: 1px solid #ddd;
+  border-top-style: none;
+}
+
+#calc-body {
+  padding: 0.5em;
+  border: 1px solid #000;
+  border-top-style: none;
+}
+
+#dps-header {
+  padding-top: 0.5em;
+}
+
 .navbar-inverse .navbar-brand,
 .navbar-inverse .navbar-nav > li > a {
   color: #ABD473;

@@ -1,0 +1,150 @@
+{% load staticfiles %}
+{% if totals %}
+  <div class="container">
+    <a href="#" class="btn btn-primary btn-lg" id="full-scale">Scaling</a> -
+      compute values for stats
+    </a>
+
+    <div id="scale-progress" style="display:none; width: 500px">
+      <h3>Loading (this will take awhile)...</h3>
+      <span class="text-muted" id="scale-helper-text">Reticulating splines</span>
+      <div class="progress">
+        <div id="scale-progress-bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100">
+          <span class="sr-only">100% Complete</span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="scale-container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
+  </div>
+{% else %}
+  <p>Submit the form to calculate</p>
+{% endif %}
+
+<script type="text/javascript">
+  $('#full-scale').click(function() {
+      $('#scale-progress').show();
+      $('#scale-container').text('');
+      $('#scale-progress-bar').attr('aria-valuenow','2');
+      $('#scale-progress-bar').css('width','2%');
+      stats = ['agility','crit','haste','mastery','multistrike','versatility']
+      scale_url_base = "{% url "hunter:scalestat" %}?stat="
+
+      scale_url = scale_url_base + stats[0] + "&" + $('#hunter-form').serialize();
+      $.getJSON( scale_url, function( data ) {
+        full_data.push(to_float(data))
+        percent = 1/stats.length*100
+        $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+        $('#scale-progress-bar').css('width',percent.toString()+"%");
+      })
+      .done(function() {
+        $('#scale-helper-text').text('Integrating curves');
+        scale_url = scale_url_base + stats[1] + "&" + $('#hunter-form').serialize();
+        $.getJSON( scale_url, function( data ) {
+          full_data.push(to_float(data))
+          percent = 2/stats.length*100
+          $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+          $('#scale-progress-bar').css('width',percent.toString()+"%");
+        })
+        .done(function() {
+          $('#scale-helper-text').text('Extracting Resources');
+          scale_url = scale_url_base + stats[2] + "&" + $('#hunter-form').serialize();
+          $.getJSON( scale_url, function( data ) {
+            full_data.push(to_float(data))
+            percent = 3/stats.length*100
+            $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+            $('#scale-progress-bar').css('width',percent.toString()+"%");
+          })
+          .done(function() {
+            $('#scale-helper-text').text('Scrubbing Terrain');
+            scale_url = scale_url_base + stats[3] + "&" + $('#hunter-form').serialize();
+            $.getJSON( scale_url, function( data ) {
+              full_data.push(to_float(data))
+              percent = 4/stats.length*100
+              $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+              $('#scale-progress-bar').css('width',percent.toString()+"%");
+            })
+            .done(function() {
+              $('#scale-helper-text').text('Calculating force parameters');
+              scale_url = scale_url_base + stats[4] + "&" + $('#hunter-form').serialize();
+              $.getJSON( scale_url, function( data ) {
+                full_data.push(to_float(data))
+                percent = 5/stats.length*100
+                $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+                $('#scale-progress-bar').css('width',percent.toString()+"%");
+              })
+              .done(function() {
+                $('#scale-helper-text').text('Perturbing Matrices');
+                scale_url = scale_url_base + stats[5] + "&" + $('#hunter-form').serialize();
+                $.getJSON( scale_url, function( data ) {
+                  full_data.push(to_float(data))
+                  percent = 6/stats.length*100
+                  $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
+                  $('#scale-progress-bar').css('width',percent.toString()+"%");
+                })
+                .done(function() {
+                  $('#scale-progress').hide();
+                  console.log(full_data);
+                  $(function () {
+                    $('#scale-container').highcharts({
+                        title: {
+                            text: 'Hunter Relative Stat Values',
+                            x: -20 //center
+                        },
+                        subtitle: {
+                            text: '{{ subtitle }}',
+                            x: -20
+                        },
+                        xAxis: {
+                            categories: [0,500,1000,1500,2000]
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'DPS'
+                            },
+                            plotLines: [{
+                                value: 0,
+                                width: 1,
+                                color: '#808080'
+                            }]
+                        },
+                        tooltip: {
+                            valueSuffix: ' DPS'
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'middle',
+                            borderWidth: 0
+                        },
+                        series: [{
+                            name: 'Agility',
+                            data: full_data[0]
+                        }, {
+                            name: 'Crit',
+                            data: full_data[1]
+                        }, {
+                            name: 'Haste',
+                            data: full_data[2]
+                        }, {
+                            name: 'Mastery',
+                            data: full_data[3]
+                        }, {
+                            name: 'Multistrike',
+                            data: full_data[4]
+                        }, {
+                            name: 'Versatility',
+                            data: full_data[5]
+                        }]
+                    });
+                  });
+                  
+                  
+                });
+              })
+            })
+          })
+        });
+      });
+    });
+  </script>

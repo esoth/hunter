@@ -5,604 +5,94 @@
   <ul id="calc-tabs" class="nav nav-tabs">
     <li class="active"><a href="#tabs-input" data-toggle="tab">Input</a></li>
     <li><a href="#tabs-stats" data-toggle="tab">Stats</a></li>
+    <li><a href="#tabs-procs" data-toggle="tab">Procs</a></li>
     <li><a href="#tabs-spells" data-toggle="tab">Shots/Abilities</a></li>
     <li><a href="#tabs-single" data-toggle="tab">Single target</a></li>
     <li><a href="#tabs-aoe" data-toggle="tab">AoE</a></li>
     <li><a href="#tabs-scaling" data-toggle="tab">Scaling</a></li>
   </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane fade in active" id="tabs-input">
-      <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-          {% if totals %}
-            <span id="dps" class="badge">DPS: {{ totals.dps }}</span>
-              {% if totals.diff_success == "success" %}
-                <small class="text-success">(+{{ totals.diff }})</small>
-              {% else %}
-                <small class="text-warning">(-{{ totals.diff }})</small>
-              {% endif %}
-            <span style="padding-left: 2em;" class="text-muted">Please use the other tabs for more detailed results</span>
-          {% else %}
-            <div class="panel panel-warning">
-              <div class="panel-heading">
-                <h3 class="panel-title">Warning</h3>
-              </div>
-              <div class="panel-body">
-                Results not yet calculated - hit the "Shoot" button
-              </div>
-            </div>
-          {% endif %}</div>
-        <div class="col-md-3"></div>
-      </div>
-      <div class="row">
-        <div class="col-md-5">
-          
-          <h3>Enter Stats:</h3>
-          <form action="{% url 'hunter:calc' %}" method="post" id="hunter-form">
-            {% csrf_token %}
-            <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
-
-            <ul id="input-tabs" class="nav nav-tabs">
-              <li class="active"><a href="#subtabs-stats" data-toggle="tab">Stats and Talents</a></li>
-              <li><a href="#subtabs-rotation" data-toggle="tab">Rotation options</a></li>
-            </ul>
-
-            <div class="tab-content">
-              <div class="tab-pane fade in active" id="subtabs-stats">
-                <table class="table">
-                  {{ form.as_table }}
-                </table>
-              </div>
-              <div class="tab-pane fade" id="subtabs-rotation">
-                <h3>Beast Master</h3>
-                <table class="table">
-                  {{ bmo.as_table }}
-                </table>
-                <h3>Marksmanship</h3>
-                <table class="table">
-                  {{ mmo.as_table }}
-                </table>
-                <h3>Survival</h3>
-                <table class="table">
-                  {{ svo.as_table }}
-                </table>
-                <h3>AoE</h3>
-                <table class="table">
-                  {{ aeo.as_table }}
-                </table>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-success">
-              Shoot
-              <span class="glyphicon glyphicon-screenshot"></span>
-            </button>
-          </form>
-        </div>
-
-        <div class="col-md-2" id="vertical-banner">
-          <img class="center" src="{% static "hunter/shoot.png" %}" />
-        </div>
-
-        <div class="col-md-5">
-          <h3>Armory Import:</h3>
-          <form action="{% url 'hunter:armory_process' %}" method="post">
-            {% csrf_token %}
-            <table class="table">
-              {{ armory.as_table }}
-              <tr>
-                <th>Item Squish</th>
-                <td><input type="checkbox" checked="checked" disabled="disabled" /></td>
-              </tr>
-            </table>
-            <button type="submit" class="btn btn-success">
-              Shoot
-              <span class="glyphicon glyphicon-screenshot"></span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-pane fade" id="tabs-stats">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-        <h3 class="panel-title">Note</h3>
-        </div>
-        <div class="panel-body">The 'total' for each stat excludes procs.</div>
-      </div>
-      {% if not stattable %}
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-            <h3 class="panel-title">Warning</h3>
-          </div>
-          <div class="panel-body">
-            Results not yet calculated - hit the "Shoot" button
-          </div>
-        </div>
-      {% endif %}
-      {% for statgroup in stattable %}
-        <div class="row">
-          {% for stat in statgroup %}
-            {% if stat %}
-            <div class="col-sm-4">
-              <div class="panel-hunter panel">
-                <div class="panel-heading">
-                  <h3 class="panel-title">{{ stat.title }}</h3>
-                </div>
-                <div class="panel-body">
-                  <table class="table">
-                    {% for component in stat.components %}
-                      <tr>
-                        <th>
-                          {% if component.description %}
-                            <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                               title="{{ component.description }}">
-                              {{ component.title }}
-                            </a>
-                          {% else %}
-                            {{ component.title }}
-                          {% endif %}
-                        </th>
-                        <td>{{ component.value }}</td>
-                      </tr>
-                    {% endfor %}
-                    <tr>
-                      <th>
-                        {% if stat.description %}
-                          <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                             title="{{ stat.description }}">Total</a>
-                        {% else %}
-                          Total
-                        {% endif %}
-                      </th>
-                      <td>{{ stat.total }}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
+  <div id="calc-body">
+  
+    <div class="row" id="dps-header">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        {% if totals %}
+          <span id="dps" class="badge">DPS: {{ totals.dps }}</span>
+            {% if totals.diff_success == "success" %}
+              <small class="text-success">(+{{ totals.diff }})</small>
+            {% else %}
+              <small class="text-warning">(-{{ totals.diff }})</small>
             {% endif %}
-          {% endfor %}
-        </div>
-      {% endfor %}
-    </div>
-
-    <div class="tab-pane fade" id="tabs-spells">
-      {% if not spelltable %}
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-            <h3 class="panel-title">Warning</h3>
-          </div>
-          <div class="panel-body">
-            Results not yet calculated - hit the "Shoot" button
-          </div>
-        </div>
-      {% endif %}
-
-      <!-- {% for spell in spelllist %}
-        <a href="#{{ spell.id }}">{{ spell.name }}</a>
-        {% if not forloop.last %}|{% endif %}
-      {% endfor %} -->
-
-      {% for spellgroup in spelltable %}
-        <div class="row">
-          {% for spell in spellgroup %}
-            {% if spell %}
-              <div class="col-sm-4">
-                <div class="panel-hunter panel">
-                  <div class="panel-heading">
-                    <h3 id="{{ spell.id }}" class="panel-title">{{ spell.name }}</h3>
-                  </div>
-                  <div class="panel-body">
-                    <table class="table">
-                      {% for attr in spell.attributes %}
-                        {% if attr.value %}
-                          <tr class="{{ attr.klass }}">
-                            <th>
-                              {% if attr.description %}
-                                <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
-                                  title="{{ attr.description }}">
-                                  {{ attr.title }}
-                                </a>
-                              {% else %}
-                                {{ attr.title }}
-                              {% endif %}
-                            </th>
-                            <td>
-                              {% if attr.title == 'Damage' %}
-                                 <span class="badge">{{ attr.value }}</span>
-                              {% else %}
-                                 {{ attr.value }}
-                              {% endif %}
-                            </td>
-                          </tr>
-                        {% endif %}
-                      {% endfor %}
-                    </table>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endfor %}
-    </div>
-
-    <div class="tab-pane fade" id="tabs-single">
-      {% if totals %}
-        <div class="col-lg-13">
-          <a href="#" target="_blank" class="btn btn-primary btn-lg" id="full-model">View Model</a> -
-          view a full model of all abilities in action.
-        </div>
-        <div class="row">
-          <div class="col-md-5">
-            <h3>Totals</h3>
-            <table class="table" id="totals_table">
-              <tr>
-                <th>DPS:</th>
-                <td class="totals_column"><span class="badge">{{ totals.dps }}</span></td>
-              </tr>
-              <tr>
-                <th>Damage:</th>
-                <td class="totals_column">{{ totals.damage }}</td>
-              </tr>
-              <tr>
-                <th>Time:</th>
-                <td class="totals_column">{{ totals.time|stringformat:".02f" }}</td>
-              </tr>
-            </table>
-            <h3>Ability Counts</h3>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Ability</th>
-                  <th class="totals_column">Count</th>
-                  <th class="totals_column">Damage</th>
-                  <th class="totals_column">%</th>
-                </tr>
-              </thead>
-              {% for shot in totals.shots %}
-                <tr>
-                  <th>{{ shot.name }}:</th>
-                  <td class="totals_column">{{ shot.counter }}</td>
-                  <td class="totals_column">{{ shot.total|stringformat:"0.2f" }}</td>
-                  <td class="totals_column">{{ shot.percent|stringformat:"0.2f" }}%</td>
-                </tr>
-              {% endfor %}
-            </table>
-          </div>
-
-          <div class="col-md-5">
-            <div id="container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
-
-            <script type="text/javascript">
-              $(function () {
-                $('#container').highcharts({
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: 1,//null,
-                        plotShadow: false
-                    },
-                    title: {
-                        text: 'Ability Breakdown'
-                    },
-                    tooltip: {
-                	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                                style: {
-                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                                }
-                            }
-                        }
-                    },
-                    series: [{
-                        type: 'pie',
-                        name: 'Per cent of total',
-                        data: [
-                          {% for shot in totals.shots|dictsort:"percent" %}
-                            {% if shot.percent %}
-                              ['{{ shot.name }}', {{ shot.percent }}],
-                            {% endif %}
-                          {% endfor %}
-                        ]
-                    }]
-                });
-            });
-            </script>
-          </div>
-        </div>
-      {% else %}
-        <p>Submit the form to calculate single target DPS</p>
-      {% endif %}
-      <br/>
-      <br/>
-    </div>
-
-    <div class="tab-pane fade" id="tabs-aoe">
-      {% if aoetotals %}
-        <div class="col-lg-13">
-          <a href="#" target="_blank" class="btn btn-primary btn-lg" id="full-model-aoe">View Model</a> -
-          view a full model of all abilities in action.
-        </div>
-        <div class="row">
-          <div class="col-md-5">
-            <h3>Totals</h3>
-            <table class="table" id="aoe_totals_table">
-              <tr>
-                <th>DPS:</th>
-                <td class="totals_column"><span class="badge">{{ aoetotals.dps }}</span></td>
-              </tr>
-              <tr>
-                <th>Damage:</th>
-                <td class="totals_column">{{ aoetotals.damage }}</td>
-              </tr>
-              <tr>
-                <th>Time:</th>
-                <td class="totals_column">{{ aoetotals.time|stringformat:".02f" }}</td>
-              </tr>
-            </table>
-            <h3>Ability Counts</h3>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Ability</th>
-                  <th class="totals_column">Count</th>
-                  <th class="totals_column">Damage</th>
-                  <th class="totals_column">%</th>
-                </tr>
-              </thead>
-              {% for shot in aoetotals.shots %}
-                <tr>
-                  <th>{{ shot.name }}:</th>
-                  <td class="totals_column">{{ shot.counter }}</td>
-                  <td class="totals_column">{{ shot.total|stringformat:"0.2f" }}</td>
-                  <td class="totals_column">{{ shot.percent|stringformat:"0.2f" }}%</td>
-                </tr>
-              {% endfor %}
-            </table>
-          </div>
-
-          <div class="col-md-5">
-            <div id="container_aoe" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
-
-            <script type="text/javascript">
-              $(function () {
-                $('#container_aoe').highcharts({
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: 1,//null,
-                        plotShadow: false
-                    },
-                    title: {
-                        text: 'Ability Breakdown'
-                    },
-                    tooltip: {
-                	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                                style: {
-                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                                }
-                            }
-                        }
-                    },
-                    series: [{
-                        type: 'pie',
-                        name: 'Per cent of total',
-                        data: [
-                          {% for shot in aoetotals.shots|dictsort:"percent" %}
-                            {% if shot.percent %}
-                              ['{{ shot.name }}', {{ shot.percent }}],
-                            {% endif %}
-                          {% endfor %}
-                        ]
-                    }]
-                });
-            });
-            </script>
-          </div>
-        </div>
-      {% else %}
-        <p>Submit the form to calculate single target DPS</p>
-      {% endif %}
-      <br/>
-      <br/>
-    </div>
-
-    <div class="tab-pane fade" id="tabs-scaling">
-      {% if totals %}
-        <div class="container">
-          <a href="#" class="btn btn-primary btn-lg" id="full-scale">Scaling</a> -
-            compute values for stats
-          </a>
-
-          <div id="scale-progress" style="display:none; width: 500px">
-            <h3>Loading (this will take awhile)...</h3>
-            <span class="text-muted" id="scale-helper-text">Reticulating splines</span>
-            <div class="progress">
-              <div id="scale-progress-bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100">
-                <span class="sr-only">100% Complete</span>
-              </div>
+          <span style="padding-left: 2em;" class="text-muted">Please use the other tabs for more detailed results</span>
+        {% else %}
+          <div class="panel panel-warning">
+            <div class="panel-heading">
+              <h3 class="panel-title">Warning</h3>
+            </div>
+            <div class="panel-body">
+              Results not yet calculated - click "Calculate" on the input tab
             </div>
           </div>
-          
-          <div id="scale-container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
-        </div>
-      {% else %}
-        <p>Submit the form to calculate</p>
-      {% endif %}
+        {% endif %}</div>
+      <div class="col-md-3"></div>
     </div>
-
-    <script type="text/javascript">
-      model_url = "{% url "hunter:model" %}?" + $('#hunter-form').serialize();
-      $('#full-model').attr('href',model_url);
-      aoemodel_url = "{% url "hunter:aoemodel" %}?" + $('#hunter-form').serialize();
-      $('#full-model-aoe').attr('href',aoemodel_url);
-      full_data = []
-      
-      function to_float(arr) {
-        new_arr = []
-        for (i=0;i<arr.length;i++) {
-          new_arr.push(parseFloat(arr[i]))
+    
+    <div class="tab-content">
+      <div class="tab-pane fade in active" id="tabs-input">
+        {% include "hunter/input.html" %}
+      </div>
+  
+      <div class="tab-pane fade" id="tabs-stats">
+        {% include "hunter/stats.html" %}
+      </div>
+  
+      <div class="tab-pane fade" id="tabs-procs">
+        {% include "hunter/procs.html" %}
+      </div>
+  
+      <div class="tab-pane fade" id="tabs-spells">
+        {% include "hunter/spells.html" %}
+      </div>
+  
+      <div class="tab-pane fade" id="tabs-single">
+        {% include "hunter/single.html" %}
+      </div>
+  
+      <div class="tab-pane fade" id="tabs-aoe">
+        {% include "hunter/aoe.html" %}
+      </div>
+  
+      <div class="tab-pane fade" id="tabs-scaling">
+        {% include "hunter/scaling.html" %}
+      </div>
+  
+      <script type="text/javascript">
+        full_data = []
+        
+        function to_float(arr) {
+          new_arr = []
+          for (i=0;i<arr.length;i++) {
+            new_arr.push(parseFloat(arr[i]))
+          }
+          return new_arr
         }
-        return new_arr
-      }
-
-      $('#full-scale').click(function() {
-        $('#scale-progress').show();
-        $('#scale-container').text('');
-        $('#scale-progress-bar').attr('aria-valuenow','2');
-        $('#scale-progress-bar').css('width','2%');
-        stats = ['agility','crit','haste','mastery','multistrike','versatility']
-        scale_url_base = "{% url "hunter:scalestat" %}?stat="
-
-        scale_url = scale_url_base + stats[0] + "&" + $('#hunter-form').serialize();
-        $.getJSON( scale_url, function( data ) {
-          full_data.push(to_float(data))
-          percent = 1/stats.length*100
-          $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
-          $('#scale-progress-bar').css('width',percent.toString()+"%");
-        })
-        .done(function() {
-          $('#scale-helper-text').text('Integrating curves');
-          scale_url = scale_url_base + stats[1] + "&" + $('#hunter-form').serialize();
-          $.getJSON( scale_url, function( data ) {
-            full_data.push(to_float(data))
-            percent = 2/stats.length*100
-            $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
-            $('#scale-progress-bar').css('width',percent.toString()+"%");
-          })
-          .done(function() {
-            $('#scale-helper-text').text('Extracting Resources');
-            scale_url = scale_url_base + stats[2] + "&" + $('#hunter-form').serialize();
-            $.getJSON( scale_url, function( data ) {
-              full_data.push(to_float(data))
-              percent = 3/stats.length*100
-              $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
-              $('#scale-progress-bar').css('width',percent.toString()+"%");
-            })
-            .done(function() {
-              $('#scale-helper-text').text('Scrubbing Terrain');
-              scale_url = scale_url_base + stats[3] + "&" + $('#hunter-form').serialize();
-              $.getJSON( scale_url, function( data ) {
-                full_data.push(to_float(data))
-                percent = 4/stats.length*100
-                $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
-                $('#scale-progress-bar').css('width',percent.toString()+"%");
-              })
-              .done(function() {
-                $('#scale-helper-text').text('Calculating force parameters');
-                scale_url = scale_url_base + stats[4] + "&" + $('#hunter-form').serialize();
-                $.getJSON( scale_url, function( data ) {
-                  full_data.push(to_float(data))
-                  percent = 5/stats.length*100
-                  $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
-                  $('#scale-progress-bar').css('width',percent.toString()+"%");
-                })
-                .done(function() {
-                  $('#scale-helper-text').text('Perturbing Matrices');
-                  scale_url = scale_url_base + stats[5] + "&" + $('#hunter-form').serialize();
-                  $.getJSON( scale_url, function( data ) {
-                    full_data.push(to_float(data))
-                    percent = 6/stats.length*100
-                    $('#scale-progress-bar').attr('aria-valuenow',percent.toString());
-                    $('#scale-progress-bar').css('width',percent.toString()+"%");
-                  })
-                  .done(function() {
-                    $('#scale-progress').hide();
-                    console.log(full_data);
-                    $(function () {
-                      $('#scale-container').highcharts({
-                          title: {
-                              text: 'Hunter Relative Stat Values',
-                              x: -20 //center
-                          },
-                          subtitle: {
-                              text: '{{ subtitle }}',
-                              x: -20
-                          },
-                          xAxis: {
-                              categories: [0,500,1000,1500,2000]
-                          },
-                          yAxis: {
-                              title: {
-                                  text: 'DPS'
-                              },
-                              plotLines: [{
-                                  value: 0,
-                                  width: 1,
-                                  color: '#808080'
-                              }]
-                          },
-                          tooltip: {
-                              valueSuffix: ' DPS'
-                          },
-                          legend: {
-                              layout: 'vertical',
-                              align: 'right',
-                              verticalAlign: 'middle',
-                              borderWidth: 0
-                          },
-                          series: [{
-                              name: 'Agility',
-                              data: full_data[0]
-                          }, {
-                              name: 'Crit',
-                              data: full_data[1]
-                          }, {
-                              name: 'Haste',
-                              data: full_data[2]
-                          }, {
-                              name: 'Mastery',
-                              data: full_data[3]
-                          }, {
-                              name: 'Multistrike',
-                              data: full_data[4]
-                          }, {
-                              name: 'Versatility',
-                              data: full_data[5]
-                          }]
-                      });
-                    });
-                    
-                    
-                  });
-                })
-              })
-            })
-          });
-        });
-      });
-      //  $('#tabs-scaling .container').load( scale_url + ' #model' );
-      function rename_talent7() {
-        if ($('#id_spec').val() == "0") {
-          $('#id_talent7 option:last').text('Adaptability');
-        }
-        else {
-          $('#id_talent7 option:last').text('Lone Wolf');
+  
+        
+        //  $('#tabs-scaling .container').load( scale_url + ' #model' );
+        function rename_talent7() {
+          if ($('#id_spec').val() == "0") {
+            $('#id_talent7 option:last').text('Adaptability');
+          }
+          else {
+            $('#id_talent7 option:last').text('Lone Wolf');
+          };
         };
-      };
-
-      $('#id_spec').change(function() {
-        rename_talent7();
-      });
-      rename_talent7(); // on load
-    </script>
-
+  
+        $('#id_spec').change(function() {
+          rename_talent7();
+        });
+        rename_talent7(); // on load
+      </script>
+    </div>
   </div>
 {% endblock %}

@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.utils import OperationalError
-from gearitem.models import GearItem, Gem
+try:
+  from gearitem.models import GearItem, Gem
+except:
+  pass
 
 from calcs.tools import RACES, SPECS, REGIONS, SERVERS, TIER1, TIER2, TIER3, TIER4, TIER5, TIER6, TIER7
 
@@ -19,21 +22,6 @@ class HunterModel(models.Model):
     spec = models.IntegerField(default=0,
                                verbose_name="Specialization",
                                choices=SPECS)
-    weaponmin = models.IntegerField(default=952,
-                               verbose_name="Weapon (min)",)
-    weaponmax = models.IntegerField(default=1430,
-                               verbose_name="Weapon (max)",)
-    weaponspeed = models.FloatField(default=3,
-                               verbose_name="Weapon Speed",)
-#    talent1 = models.IntegerField(default=tier1[0],
-#                               verbose_name="Talents - level 15",
-#                               choices=tier1,max_length=30)
-#    talent2 = models.IntegerField(default=tier2[0],
-#                               verbose_name="Talents - level 30",
-#                               choices=tier2,max_length=30)
-#    talent3 = models.IntegerField(default=tier3[0],
-#                               verbose_name="Talents - level 45",
-#                               choices=tier3,max_length=30)
     talent4 = models.IntegerField(default=tier4[0],
                                verbose_name="Talents - level 60",
                                choices=tier4,max_length=30)
@@ -46,12 +34,6 @@ class HunterModel(models.Model):
     talent7 = models.IntegerField(default=tier7[0],
                                verbose_name="Talents - level 100",
                                choices=tier7,max_length=30)
-    agility = models.IntegerField(default=2378) #21406)
-    crit = models.IntegerField(default=1028)
-    haste = models.IntegerField(default=748)
-    mastery = models.IntegerField(default=737)
-    multistrike = models.IntegerField(default=506)
-    versatility = models.IntegerField(default=77)
 
 class ArmoryModel(models.Model):
     region = models.CharField(choices=REGIONS,
@@ -111,7 +93,7 @@ def slot_maker(*args):
     options = [('','(None equipped)')]
     options.extend([(itm,itm) for itm in itms])
     return options
-  except OperationalError: # if table doesn't exist yet
+  except: # if table doesn't exist yet
     return []
   
 head_slots = slot_maker(1)
@@ -140,7 +122,7 @@ except:
 
 class GearEquipModel(models.Model):
     weapon = models.CharField(choices=weapon_slots,
-                            default='',
+                            default='Crystalline Branch of the Brackenspore',
                             max_length=30)
     weapon_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -151,7 +133,7 @@ class GearEquipModel(models.Model):
     weapon_warforged = models.BooleanField(default=False,)
 
     head = models.CharField(choices=head_slots,
-                            default='',
+                            default='Gronn-Skin Crown',
                             max_length=30)
     head_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -162,7 +144,7 @@ class GearEquipModel(models.Model):
     head_warforged = models.BooleanField(default=False,)
 
     neck = models.CharField(choices=neck_slots,
-                            default='',
+                            default='Reaver\'s Nose Ring',
                             max_length=30)
     neck_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -173,7 +155,7 @@ class GearEquipModel(models.Model):
     neck_warforged = models.BooleanField(default=False,)
 
     shoulders = models.CharField(choices=shoulder_slots,
-                            default='',
+                            default='Living Mountain Shoulderguards',
                             max_length=30)
     shoulders_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -184,7 +166,7 @@ class GearEquipModel(models.Model):
     shoulders_warforged = models.BooleanField(default=False,)
 
     back = models.CharField(choices=back_slots,
-                            default='',
+                            default='Cloak of Creeping Necrosis',
                             max_length=30)
     back_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -195,7 +177,7 @@ class GearEquipModel(models.Model):
     back_warforged = models.BooleanField(default=False,)
 
     chest = models.CharField(choices=chest_slots,
-                            default='',
+                            default='Moss-Woven Mailshirt',
                             max_length=30)
     chest_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -206,7 +188,7 @@ class GearEquipModel(models.Model):
     chest_warforged = models.BooleanField(default=False,)
 
     wrists = models.CharField(choices=wrists_slots,
-                            default='',
+                            default='Bracers of the Crying Chorus',
                             max_length=30)
     wrists_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -217,7 +199,7 @@ class GearEquipModel(models.Model):
     wrists_warforged = models.BooleanField(default=False,)
 
     hands = models.CharField(choices=hands_slots,
-                            default='',
+                            default='Grips of Vicious Mauling',
                             max_length=30)
     hands_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -228,7 +210,7 @@ class GearEquipModel(models.Model):
     hands_warforged = models.BooleanField(default=False,)
 
     waist = models.CharField(choices=waist_slots,
-                            default='',
+                            default='Belt of Imminent Lies',
                             max_length=30)
     waist_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -239,7 +221,7 @@ class GearEquipModel(models.Model):
     waist_warforged = models.BooleanField(default=False,)
 
     legs = models.CharField(choices=legs_slots,
-                            default='',
+                            default='Leggings of Broken Magic',
                             max_length=30)
     legs_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -250,7 +232,7 @@ class GearEquipModel(models.Model):
     legs_warforged = models.BooleanField(default=False,)
 
     feet = models.CharField(choices=feet_slots,
-                            default='',
+                            default='Face Kickers',
                             max_length=30)
     feet_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -261,7 +243,7 @@ class GearEquipModel(models.Model):
     feet_warforged = models.BooleanField(default=False,)
 
     ring1 = models.CharField(choices=ring_slots,
-                            default='',
+                            default='Flenser\'s Hookring',
                             max_length=30)
     ring1_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -272,7 +254,7 @@ class GearEquipModel(models.Model):
     ring1_warforged = models.BooleanField(default=False,)
 
     ring2 = models.CharField(choices=ring_slots,
-                            default='',
+                            default='Spell-Sink Signet',
                             max_length=30)
     ring2_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -283,7 +265,7 @@ class GearEquipModel(models.Model):
     ring2_warforged = models.BooleanField(default=False,)
 
     trinket1 = models.CharField(choices=trinket_slots,
-                            default='',
+                            default='Captive Micro-Aberration',
                             max_length=30)
     trinket1_difficulty = models.CharField(choices=difficulty_options,
                             default='',
@@ -294,7 +276,7 @@ class GearEquipModel(models.Model):
     trinket1_warforged = models.BooleanField(default=False,)
 
     trinket2 = models.CharField(choices=trinket_slots,
-                            default='',
+                            default='Scales of Doom',
                             max_length=30)
     trinket2_difficulty = models.CharField(choices=difficulty_options,
                             default='',

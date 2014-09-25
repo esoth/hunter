@@ -1,0 +1,78 @@
+{% load staticfiles %}
+{% if not proc_info %}
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">Warning</h3>
+    </div>
+    <div class="panel-body">
+      Results not yet calculated - click the "Calculate" button
+    </div>
+  </div>
+{% endif %}
+
+{% for procstat,proc in proc_info.items %}
+  <div class="row">
+      <div class="col-sm-4">
+        <div class="panel-hunter panel">
+          <div class="panel-heading">
+            <h3 class="panel-title">{{ procstat|capfirst }}</h3>
+          </div>
+          <div class="panel-body">
+            <h4>Total: <small>{{ proc.total}}</small></h4>
+            {% if proc.summary %}
+              <table class="table">
+                <tr>
+                  <th colspan="2">Summary</th>
+                </tr>
+                {% for sum in proc.summary %}
+                  <tr>
+                    <td>{{ sum.name }}</td>
+                    <td>{{ sum.effect|floatformat:2 }}</td>
+                  </tr>
+                {% endfor %}
+              </table>
+            {% endif %}
+            
+            {% if proc.info %}<h5>Proc details</h5>{% endif %}
+            {% for trinket in proc.info %}
+              <table class="table">
+                <tr><th colspan="2">{{ trinket.name }}</th></tr>
+                <tr>
+                  <td>Magnitude</td>
+                  <td>{{ trinket.magnitude }}</td>
+                </tr>
+                {% if trinket.cooldown %}
+                  <tr>
+                    <td>Cooldown</td>
+                    <td>{{ trinket.cooldown }}</td>
+                  </tr>
+                {% endif %}
+                {% if trinket.rppm %}
+                  <tr>
+                    <td>RPPM</td>
+                    <td>{{ trinket.rppm }}</td>
+                  </tr>
+                {% endif %}
+                <tr>
+                  <td>Duration</td>
+                  <td>{{ trinket.duration }}</td>
+                </tr>
+                <tr>
+                  <td>Uptime</td>
+                  <td>{{ trinket.uptime }}%</td>
+                </tr>
+                <tr>
+                  <td>Equipped</td>
+                  <td>{{ trinket.equipped }}</td>
+                </tr>
+                <tr>
+                  <td>Effect</td>
+                  <td>{{ trinket.effect_display }}</td>
+                </tr>
+              </table>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+  </div>
+{% endfor %}

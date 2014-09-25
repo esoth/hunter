@@ -1,0 +1,320 @@
+{% load staticfiles %}
+
+<ul id="input-tabs" class="nav nav-tabs">
+  <li class="active"><a href="#subtabs-stats" data-toggle="tab">Gear</a></li>
+  <li><a href="#subtabs-rotation" data-toggle="tab">Talents and options</a></li>
+</ul>
+
+<form method="POST" action="{% url 'hunter:calc' %}" id="hunter-form">
+  <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
+  <div class="tab-content" id="subtabs">
+    <div class="tab-pane fade in active" id="subtabs-stats">
+      <button class="btn btn-primary" data-toggle="modal" data-target="#api_fetch">
+        Armory Import
+      </button>
+      <button class="btn btn-success" data-toggle="modal" data-target="#equip_help">
+        Help
+      </button>
+  
+        {% csrf_token %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Slot</th>
+              <th>ilvl</th>
+              <th>Item</th>
+              <th>Bonus</th>
+              <th>Socket</th>
+              <th>
+                <a class="step-tooltip" data-toggle="tooltip" data-placement="top" title="Warforged">
+                 WF
+                </a>
+              </th>
+              <th>Agi</th>
+              <th>Crt</th>
+              <th>Hst</th>
+              <th>Mas</th>
+              <th>Mst</th>
+              <th>Ver</th>
+              <th>Boss/Source</th>
+              <th>Zone</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in slots %}
+              <tr id="{{ slot.id }}_row">
+                <td>
+                  <label for="id_{{ slot.id }}">
+                    {% if slot.small %}<small>{{ slot.name }}</small>{% else %}
+                    {{ slot.name }}{% endif %}
+                  </label>
+                </td>
+                <td><span id="{{ slot.id }}_ilvl" /></td>
+                <td>
+                  <img id="icon_{{ slot.id }}" src="http://us.media.blizzard.com/wow/icons/18/inv_misc_questionmark.jpg" />
+                  {{ slot.form }}
+                </td>
+                <td>{{ slot.difficulty }}</td>
+                <td>{{ slot.socket }}</td>
+                <td>{{ slot.warforged }}</td>
+                <td id="{{ slot.id }}_agility">
+                  <span></span>
+                  <input type="hidden" name="agility[{{ forloop.counter }}]" />
+                </td>
+                <td id="{{ slot.id }}_crit">
+                  <span></span>
+                  <input type="hidden" name="crit[{{ forloop.counter }}]" />
+                </td>
+                <td id="{{ slot.id }}_haste">
+                  <span></span>
+                  <input type="hidden" name="haste[{{ forloop.counter }}]" />
+                </td>
+                <td id="{{ slot.id }}_mastery">
+                  <span></span>
+                  <input type="hidden" name="mastery[{{ forloop.counter }}]" />
+                </td>
+                <td id="{{ slot.id }}_multistrike">
+                  <span></span>
+                  <input type="hidden" name="multistrike[{{ forloop.counter }}]" />
+                </td>
+                <td id="{{ slot.id }}_versatility">
+                  <span></span>
+                  <input type="hidden" name="versatility[{{ forloop.counter }}]" />
+                </td>
+                <td id="{{ slot.id }}_source">
+                  <span></span>
+                </td>
+                <td id="{{ slot.id }}_zone">
+                  <span></span>
+                </td>
+              </tr>
+              {% if slot.id = "weapon" %}
+                <tr>
+                  <td></td>
+                  <td colspan="12">
+                    <label for="weapon_min">Weapon Min:</label>
+                    <span id="weapon_min" style="padding-right:2em;">
+                      <input type="hidden" name="weapon_min" value="{{ minw }}" />
+                      <span>{{ minw|floatformat:"0" }}</span>
+                    </span>
+                    <label for="weapon_max">Weapon Max:</label>
+                    <span id="weapon_max" style="padding-right:2em;">
+                      <input type="hidden" name="weapon_max" value="{{ maxw }}" />
+                      <span>{{ maxw|floatformat:"0" }}</span>
+                    </span>
+                    <label for="weapon_speed">Weapon Speed:</label>
+                    <span id="weapon_speed">
+                      <input type="hidden" name="weapon_speed" value="{{ speedw }}" />  
+                      <span>{{ speedw }}</span>
+                    </span>            
+                  </td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    <div class="tab-pane fade" id="subtabs-rotation">
+      <h3>Talents/Race</h3>
+      <table class="table">
+        {{ meta.as_table }}
+      </table>    
+      <h3>Beast Master</h3>
+      <table class="table">
+        {{ bmo.as_table }}
+      </table>
+      <h3>Marksmanship</h3>
+      <table class="table">
+        {{ mmo.as_table }}
+      </table>
+      <h3>Survival</h3>
+      <table class="table">
+        {{ svo.as_table }}
+      </table>
+      <h3>AoE</h3>
+      <table class="table">
+        {{ aeo.as_table }}
+      </table>
+    </div>
+  </div>
+  
+  <button type="submit" class="btn btn-success">
+    <span class="glyphicon glyphicon-screenshot"></span>
+    Calculate
+  </button>
+</form>
+<br/>
+<br/>
+
+<div class="modal fade" id="api_fetch" tabindex="-1" role="dialog" aria-labelledby="ArmoryFetch" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Armory Import</h4>
+      </div>
+      <form action="{% url 'hunter:calc' %}" method="POST">
+        <div class="modal-body">
+          {{ armory_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Import</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="equip_help" tabindex="-1" role="dialog" aria-labelledby="EquipHelp" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">What Do These Options Mean?</h4>
+      </div>          
+      <div class="modal-body">
+        <p>This page is designed with typical Warlords of Draenor gear in mind. Some of these options/toggles can be used on Mists of Pandaria
+           gear in this form, but it makes no sense to do so. Adapting this form to accomodate both MoP and WoD gear would over
+           complicate it so I opted to focus just on WoD. This means the following:</p>
+        <ul>
+          <li>Normal, heroic, and mythic versions of gear actually has the same item id, so we can't go by name/id alone!</li>
+          <li>Once an item is selected, you should choose a normal, heroic, or mythic version if applicable. Normal is the default
+            so if it's something like quest gear you can just leave this value unchanged</li>
+          <li>Warforged gear is also an option for raid gear, again using the same id.</li>
+          <li>A socket is another possible attribute for raid gear, again using the same id. Pre-WoD gear with multiple sockets is not supported</li>
+          <li>Tertiary attributes are not shown because they have no DPS bearing (same with stamina).</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+<script type="text/javascript">  
+  function item_switch(slot,val) {
+    var base_media_url = 'http://us.media.blizzard.com/wow/icons/18/';
+    var gear_table_val = val && gear_table[val.replace("'","\'")] || "";
+    var stats = new Array("agility","crit","haste","mastery","multistrike","versatility","source","zone");
+    for (i=0;i<=stats.length;i++) {
+      if (gear_table_val) {
+        if (gear_table_val['ilvl'] >= 600) {
+          base_media_url = 'http://wow.zamimg.com/images/wow/icons/small/';
+        }
+        $('#'+slot+'_'+stats[i]+' span').html(gear_table_val[stats[i]]);
+        $('#'+slot+'_'+stats[i]+' input').val(gear_table_val[stats[i]]);
+        $('#icon_'+slot).attr('src',base_media_url+gear_table_val['icon']+'.jpg');
+      }
+      else {
+        if (stats[i] == "source" || stats[i] == "zone") {
+          $('#'+slot+'_'+stats[i]+' span').html("");
+        }
+        else {
+          $('#'+slot+'_'+stats[i]+' span').html("0");
+        }
+        $('#'+slot+'_'+stats[i]+' input').val(0);
+      }
+    }
+    if (slot == "weapon") {
+      $('#weapon_min span').html(Math.ceil(gear_table_val['weapon_min']))
+      $('#weapon_min input').val(gear_table_val['weapon_min'])
+      $('#weapon_max span').html(Math.ceil(gear_table_val['weapon_max']))
+      $('#weapon_max input').val(gear_table_val['weapon_max'])
+      $('#weapon_speed span').html(Math.ceil(gear_table_val['weapon_speed']))
+      $('#weapon_speed input').val(gear_table_val['weapon_speed'])
+    }
+    var $this = $('#id_'+slot+'_difficulty');
+    var warforged = $('#id_'+slot+'_warforged').is(':checked') && Math.pow(1.15,6/15) || 1;
+    difficulty_switch(slot,$this.val(),warforged);
+  };
+  
+  function difficulty_switch(slot,val,warforged) {
+    var selected_gear = $('#id_'+slot).val();
+    var gear_table_val = selected_gear && gear_table[selected_gear.replace("'","\'")] || "";
+    factor = warforged;
+    ilvl = gear_table_val['ilvl']
+    if (val == 'heroic') {
+      factor = 1.15 * warforged;
+      ilvl += 15
+    }
+    else if (val == 'mythic') {
+      factor = 1.15 * 1.15 * warforged;
+      ilvl += 30
+    }
+    if (warforged != 1) {
+      ilvl += 6;
+    }
+    $('#'+slot+'_ilvl').html(ilvl);
+    var stats = new Array("agility","crit","haste","mastery","multistrike","versatility");
+    for (i=0;i<=stats.length;i++) {
+      if (selected_gear) {
+        $('#'+slot+'_'+stats[i]+' span').html(Math.ceil(gear_table_val[stats[i]]*factor));
+        $('#'+slot+'_'+stats[i]+' input').val(Math.ceil(gear_table_val[stats[i]]*factor));
+      }
+    }
+    if (slot == "weapon") {
+      $('#weapon_min span').html(Math.ceil(gear_table_val['weapon_min']*factor))
+      $('#weapon_min input').val(gear_table_val['weapon_min']*factor)
+      $('#weapon_max span').html(Math.ceil(gear_table_val['weapon_max']*factor))
+      $('#weapon_max input').val(gear_table_val['weapon_max']*factor)
+    }
+  }
+  
+  var gear_table,
+      equipped;
+  $.getJSON("{% url "hunter:gear_table" %}", function(data) {
+    gear_table = data;
+  }).done(function() {
+    equipped = {{ equipped|safe }};
+    
+    // put our equipped gear into gear_table if not already there
+    for (i=0;i<equipped.length;i++) {
+      var $name = equipped[i]['name'];
+      if (!($name in gear_table)) {
+        gear_table[equipped[i]['name']] = {'agility':equipped[i]['agility'],
+                                           'crit':equipped[i]['crit'],
+                                           'haste':equipped[i]['haste'],
+                                           'mastery':equipped[i]['mastery'],
+                                           'multistrike':equipped[i]['multistrike'],
+                                           'versatility':equipped[i]['versatility'],
+                                           'socket':'',
+                                           'source':'(equipped)',
+                                           'zone':'(unknown)'}
+        // add it as an option
+        $('#id_'+equipped[i]['slot'])
+                        .append($('<option>')
+                        .attr('value',equipped[i]['name'])
+                        .text(equipped[i]['name']));        
+      }
+      // select it
+      $('#id_'+equipped[i]['slot']).val(equipped[i]['name']);  
+    };
+      
+    // set up onchange actions for items and difficulty toggles, and initialize
+    var slots = Array("weapon","head","neck","shoulders","back","chest","wrists","hands","waist","legs","feet","ring1","ring2","trinket1","trinket2");
+    $.each(slots, function(slot) {
+      $('#id_'+slots[slot]).change(function() {
+        var $this = $(this);
+        item_switch(slots[slot],$this.val());
+      })
+      $('#id_'+slots[slot]+'_difficulty').change(function() {
+        var $this = $(this);
+        var warforged = $('#id_'+slots[slot]+'_warforged').is(':checked') && Math.pow(1.15,6/15) || 1;
+        difficulty_switch(slots[slot],$this.val(),warforged);
+      })
+      $('#id_'+slots[slot]+'_warforged').change(function() {
+        var $this = $('#id_'+slots[slot]+'_difficulty');
+        var warforged = $('#id_'+slots[slot]+'_warforged').is(':checked') && Math.pow(1.15,6/15) || 1;
+        difficulty_switch(slots[slot],$this.val(),warforged);
+      })
+      item_switch(slots[slot],$('#id_'+slots[slot]).val());
+    });
+    model_url = "{% url "hunter:model" %}?" + $('#hunter-form').serialize();
+    $('#full-model').attr('href',model_url);
+    aoemodel_url = "{% url "hunter:aoemodel" %}?" + $('#hunter-form').serialize();
+    $('#full-model-aoe').attr('href',aoemodel_url);
+  });
+</script>

@@ -1,0 +1,68 @@
+{% load staticfiles %}
+<div class="row">
+  <div class="col-md-5">
+    
+    <h3>Enter Stats:</h3>
+    <form action="{% url 'hunter:calc' %}" method="post" id="hunter-form">
+      {% csrf_token %}
+      <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
+
+      <ul id="input-tabs" class="nav nav-tabs">
+        <li class="active"><a href="#subtabs-stats" data-toggle="tab">Stats and Talents</a></li>
+        <li><a href="#subtabs-rotation" data-toggle="tab">Rotation options</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane fade in active" id="subtabs-stats">
+          <table class="table">
+            {{ form.as_table }}
+          </table>
+        </div>
+        <div class="tab-pane fade" id="subtabs-rotation">
+          <h3>Beast Master</h3>
+          <table class="table">
+            {{ bmo.as_table }}
+          </table>
+          <h3>Marksmanship</h3>
+          <table class="table">
+            {{ mmo.as_table }}
+          </table>
+          <h3>Survival</h3>
+          <table class="table">
+            {{ svo.as_table }}
+          </table>
+          <h3>AoE</h3>
+          <table class="table">
+            {{ aeo.as_table }}
+          </table>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success">
+        Shoot
+        <span class="glyphicon glyphicon-screenshot"></span>
+      </button>
+    </form>
+  </div>
+
+  <div class="col-md-2" id="vertical-banner">
+    <img class="center" src="{% static "hunter/shoot.png" %}" />
+  </div>
+
+  <div class="col-md-5">
+    <h3>Armory Import:</h3>
+    <form action="{% url 'hunter:armory_process' %}" method="post">
+      {% csrf_token %}
+      <table class="table">
+        {{ armory.as_table }}
+        <tr>
+          <th>Item Squish</th>
+          <td><input type="checkbox" checked="checked" disabled="disabled" /></td>
+        </tr>
+      </table>
+      <button type="submit" class="btn btn-success">
+        Shoot
+        <span class="glyphicon glyphicon-screenshot"></span>
+      </button>
+    </form>
+  </div>
+</div>

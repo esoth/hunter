@@ -1,0 +1,95 @@
+{% load staticfiles %}
+{% if totals %}
+  <div class="col-lg-13">
+    <a href="#" target="_blank" class="btn btn-primary btn-lg" id="full-model">View Model</a> -
+    view a full model of all abilities in action.
+  </div>
+  <div class="row">
+    <div class="col-md-5">
+      <h3>Totals</h3>
+      <table class="table" id="totals_table">
+        <tr>
+          <th>DPS:</th>
+          <td class="totals_column"><span class="badge">{{ totals.dps }}</span></td>
+        </tr>
+        <tr>
+          <th>Damage:</th>
+          <td class="totals_column">{{ totals.damage }}</td>
+        </tr>
+        <tr>
+          <th>Time:</th>
+          <td class="totals_column">{{ totals.time|stringformat:".02f" }}</td>
+        </tr>
+      </table>
+      <h3>Ability Counts</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ability</th>
+            <th class="totals_column">Count</th>
+            <th class="totals_column">Damage</th>
+            <th class="totals_column">%</th>
+          </tr>
+        </thead>
+        {% for shot in totals.shots %}
+          <tr>
+            <th>{{ shot.name }}:</th>
+            <td class="totals_column">{{ shot.counter }}</td>
+            <td class="totals_column">{{ shot.total|stringformat:"0.2f" }}</td>
+            <td class="totals_column">{{ shot.percent|stringformat:"0.2f" }}%</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div class="col-md-5">
+      <div id="container" style="min-width: 800px; height: 700px; margin: 0 auto"></div>
+
+      <script type="text/javascript">
+        $(function () {
+          $('#container').highcharts({
+              chart: {
+                  plotBackgroundColor: null,
+                  plotBorderWidth: 1,//null,
+                  plotShadow: false
+              },
+              title: {
+                  text: 'Ability Breakdown'
+              },
+              tooltip: {
+          	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              },
+              plotOptions: {
+                  pie: {
+                      allowPointSelect: true,
+                      cursor: 'pointer',
+                      dataLabels: {
+                          enabled: true,
+                          format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                          style: {
+                              color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                          }
+                      }
+                  }
+              },
+              series: [{
+                  type: 'pie',
+                  name: 'Per cent of total',
+                  data: [
+                    {% for shot in totals.shots|dictsort:"percent" %}
+                      {% if shot.percent %}
+                        ['{{ shot.name }}', {{ shot.percent }}],
+                      {% endif %}
+                    {% endfor %}
+                  ]
+              }]
+          });
+      });
+      </script>
+    </div>
+  </div>
+{% else %}
+  <p>Submit the form to calculate single target DPS</p>
+{% endif %}
+<br/>
+<br/>

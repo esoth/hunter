@@ -1,0 +1,56 @@
+{% load staticfiles %}
+{% if not stattable %}
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">Warning</h3>
+    </div>
+    <div class="panel-body">
+      Results not yet calculated - click the "Calculate" button
+    </div>
+  </div>
+{% endif %}
+{% for statgroup in stattable %}
+  <div class="row">
+    {% for stat in statgroup %}
+      {% if stat %}
+      <div class="col-sm-4">
+        <div class="panel-hunter panel">
+          <div class="panel-heading">
+            <h3 class="panel-title">{{ stat.title }}</h3>
+          </div>
+          <div class="panel-body">
+            <table class="table">
+              {% for component in stat.components %}
+                <tr>
+                  <th>
+                    {% if component.description %}
+                      <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                         title="{{ component.description }}">
+                        {{ component.title }}
+                      </a>
+                    {% else %}
+                      {{ component.title }}
+                    {% endif %}
+                  </th>
+                  <td>{{ component.value }}</td>
+                </tr>
+              {% endfor %}
+              <tr>
+                <th>
+                  {% if stat.description %}
+                    <a class="step-tooltip" data-toggle="tooltip" data-placement="top"
+                       title="{{ stat.description }}">Total</a>
+                  {% else %}
+                    Total
+                  {% endif %}
+                </th>
+                <td>{{ stat.total }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endfor %}
