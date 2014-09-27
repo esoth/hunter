@@ -1,20 +1,23 @@
 {% load staticfiles %}
 
+
+
 <ul id="input-tabs" class="nav nav-tabs">
   <li class="active"><a href="#subtabs-stats" data-toggle="tab">Gear</a></li>
   <li><a href="#subtabs-rotation" data-toggle="tab">Talents and options</a></li>
+  <li>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#api_fetch">
+      Armory Import
+    </button>
+    <button class="btn btn-success" data-toggle="modal" data-target="#equip_help">
+      Help
+    </button>
+  </li>
 </ul>
-
 <form method="POST" action="{% url 'hunter:calc' %}" id="hunter-form">
   <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
   <div class="tab-content" id="subtabs">
     <div class="tab-pane fade in active" id="subtabs-stats">
-      <button class="btn btn-primary" data-toggle="modal" data-target="#api_fetch">
-        Armory Import
-      </button>
-      <button class="btn btn-success" data-toggle="modal" data-target="#equip_help">
-        Help
-      </button>
   
         {% csrf_token %}
         <table class="table">
@@ -50,7 +53,7 @@
                   </label>
                 </td>
                 <td><span id="{{ slot.id }}_ilvl" /></td>
-                <td>
+                <td style="width:450px">
                   <img id="icon_{{ slot.id }}" src="http://us.media.blizzard.com/wow/icons/18/inv_misc_questionmark.jpg" />
                   {{ slot.form }}
                 </td>
@@ -91,7 +94,7 @@
               {% if slot.id = "weapon" %}
                 <tr>
                   <td></td>
-                  <td colspan="12">
+                  <td colspan="13">
                     <label for="weapon_min">Weapon Min:</label>
                     <span id="weapon_min" style="padding-right:2em;">
                       <input type="hidden" name="weapon_min" value="{{ minw }}" />
@@ -155,7 +158,16 @@
       </div>
       <form action="{% url 'hunter:calc' %}" method="POST">
         <div class="modal-body">
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <h3 class="panel-title">Warning</h3>
+            </div>
+            <div class="panel-body">
+              Your stats will get "squished" - this isn't particularly useful on a level 90 character!
+            </div>
+          </div>
           {{ armory_form.as_p }}
+          {% csrf_token %}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -274,6 +286,7 @@
     for (i=0;i<equipped.length;i++) {
       var $name = equipped[i]['name'];
       if (!($name in gear_table)) {
+        console.log(equipped[i]);
         gear_table[equipped[i]['name']] = {'agility':equipped[i]['agility'],
                                            'crit':equipped[i]['crit'],
                                            'haste':equipped[i]['haste'],
@@ -281,6 +294,7 @@
                                            'multistrike':equipped[i]['multistrike'],
                                            'versatility':equipped[i]['versatility'],
                                            'socket':'',
+                                           'icon':equipped[i]['icon'],
                                            'source':'(equipped)',
                                            'zone':'(unknown)'}
         // add it as an option

@@ -1,3 +1,4 @@
+from django import forms
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -115,7 +116,7 @@ def ScaleStatView(request):
   scale = [d]
 
   stat = request.GET['stat']
-  gearstat = getattr(hunter,stat)
+  gearstat = getattr(data['hunter'],stat)
   start = gearstat.gear()
   _stat = start
   for x in range(1,4):
@@ -161,21 +162,22 @@ def GearTableView(request):
       return v
 
   for g in GearItem.objects.all():
-    gear_table[g.nameDescription and g.name + ' (' + (g.nameDescription) + ')' or g.name] = {'zone':g.zone,
-                 'source':g.source,
-                 'agility':squish(g.id,g.agility),
-                 'crit':squish(g.id,g.crit),
-                 'haste':squish(g.id,g.haste),
-                 'mastery':squish(g.id,g.mastery),
-                 'multistrike':squish(g.id,g.multistrike),
-                 'versatility':squish(g.id,g.versatility),
-                 'ilvl':g.ilvl,
-                 'icon':g.icon,
-                 'zone':g.zone,
-                 'source':g.source,
-                 'weapon_min':squish(g.id,g.weapon_min,weapon=True),
-                 'weapon_max':squish(g.id,g.weapon_max,weapon=True),
-                 'weapon_speed':g.weapon_speed}
+    gear_table[g.id] = {'zone':g.zone,
+                        'name':g.name,
+                        'source':g.source,
+                        'agility':squish(g.id,g.agility),
+                        'crit':squish(g.id,g.crit),
+                        'haste':squish(g.id,g.haste),
+                        'mastery':squish(g.id,g.mastery),
+                        'multistrike':squish(g.id,g.multistrike),
+                        'versatility':squish(g.id,g.versatility),
+                        'ilvl':g.ilvl,
+                        'icon':g.icon,
+                        'zone':g.zone,
+                        'source':g.source,
+                        'weapon_min':squish(g.id,g.weapon_min,weapon=True),
+                        'weapon_max':squish(g.id,g.weapon_max,weapon=True),
+                        'weapon_speed':g.weapon_speed}
   try:
     for g in Gem.objects.all():
       gear_table[g.name] = {'agility':g.agility,
@@ -199,25 +201,14 @@ def processEquippedGear(data):
            'weapon_min':0,
            'weapon_max':0,
            'weapon_speed':3.0,
+           'icon':'',
            'equipped':[],
            }
   # sockets
   sockets = []
   for s in SLOTS:
-    sss =s
     if data[s]:
-      if ' (Heroic)' in data[s]:
-        _name = data[s].replace(' (Heroic)','')
-        item_id = str(GearItem.objects.filter(name=_name,nameDescription="Heroic")[0].id)
-      elif ' (Warforged)' in data[s]:
-        _name = data[s].replace(' (Warforged)','')
-        item_id = str(GearItem.objects.filter(name=_name,nameDescription="Warforged")[0].id)
-      elif ' (Heroic Warforged)' in data[s]:
-        _name = data[s].replace(' (Heroic Warforged)','')
-        item_id = str(GearItem.objects.filter(name=_name,nameDescription="Heroic Warforged")[0].id)
-      else:
-        item_id = str(GearItem.objects.filter(name=data[s])[0].id)
-      _data['equipped'].append({'id':int(item_id),'bonus':''})
+      _data['equipped'].append({'id':int(data[s]),'bonus':''})
     if data.get(s+'_socket'):
       gem = Gem.objects.filter(id=data[s+'_socket'])
       if gem:
@@ -233,6 +224,7 @@ def processEquippedGear(data):
   except ValueError:
     pass # bad data - leave defaults
 
+  _data['icon'] = data.get('icon')
   for s in _stats:
     for idx in range(1,16):
       _data[s] += int(data['%s[%d]' % (s,idx)])
@@ -315,6 +307,7 @@ def process_armory(armory_form):
     attrs['id'] = slot['id']
     attrs['name'] = slot['name']
     attrs['ilvl'] = slot['itemLevel']
+    attrs['icon'] = slot['icon']
 
     # check our database to add heroic to ilvls below 600
     if (attrs['ilvl'] <= 600 or 'Fen-Yu' in attrs['name']) and GearItem.objects.filter(id=slot['id']):
@@ -402,6 +395,7 @@ def CalcView(request):
                     'mastery':attrs.get('mastery',0),
                     'multistrike':attrs.get('multistrike',0),
                     'versatility':attrs.get('versatility',0),
+                    'icon':attrs.get('icon','inv_misc_questionmark'),
                     'name':attrs.get('name',0),
                     'slot':slot,
                     'ilvl':attrs.get('ilvl',0),
