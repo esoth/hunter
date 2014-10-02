@@ -10,6 +10,15 @@
   border-top-style: none;
 }
 
+#detailsToggler {
+  display: inline;
+}
+
+#detailsToggler:hover {
+  background: none;
+  border: none;
+}
+
 #calc-body {
   padding: 0.5em;
   border: 1px solid #000;

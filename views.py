@@ -6,7 +6,7 @@ from django.template import RequestContext, loader
 from django.views import generic
 import json
 import itertools
-from urllib import urlopen
+from urllib2 import urlopen
 
 from django.forms import ModelForm
 
@@ -292,7 +292,7 @@ def process_armory(armory_form):
             'apikey':API_KEY}
   url = 'https://%(region)s.api.battle.net/wow/character/%(server)s/%(character)s?apikey=%(apikey)s&fields=stats,talents,items' % kwargs
   title = '%s of %s (%s)' % (character, SERVER_NAMES[server], region)
-  data = json.load(urlopen(url))
+  data = json.load(urlopen(url.encode('utf-8')))
 
   def squish(v):
     return int(v*.0390)

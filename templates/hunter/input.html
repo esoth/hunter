@@ -12,6 +12,8 @@
     <button class="btn btn-success" data-toggle="modal" data-target="#equip_help">
       Help
     </button>
+    
+    <a id="detailsToggler" href="javascript:void(0);">[ show/hide details ]</a>
   </li>
 </ul>
 <form method="POST" action="{% url 'hunter:calc' %}" id="hunter-form">
@@ -33,14 +35,14 @@
                  WF
                 </a>
               </th>
-              <th>Agi</th>
-              <th>Crt</th>
-              <th>Hst</th>
-              <th>Mas</th>
-              <th>Mst</th>
-              <th>Ver</th>
-              <th>Boss/Source</th>
-              <th>Zone</th>
+              <th class="details" style="display:none;">Agi</th>
+              <th class="details" style="display:none;">Crt</th>
+              <th class="details" style="display:none;">Hst</th>
+              <th class="details" style="display:none;">Mas</th>
+              <th class="details" style="display:none;">Mst</th>
+              <th class="details" style="display:none;">Ver</th>
+              <th class="details" style="display:none;">Boss/Source</th>
+              <th class="details" style="display:none;">Zone</th>
             </tr>
           </thead>
           <tbody>
@@ -60,34 +62,34 @@
                 <td>{{ slot.difficulty }}</td>
                 <td>{{ slot.socket }}</td>
                 <td>{{ slot.warforged }}</td>
-                <td id="{{ slot.id }}_agility">
+                <td class="details" style="display:none;" id="{{ slot.id }}_agility">
                   <span></span>
                   <input type="hidden" name="agility[{{ forloop.counter }}]" />
                 </td>
-                <td id="{{ slot.id }}_crit">
+                <td class="details" style="display:none;" id="{{ slot.id }}_crit">
                   <span></span>
                   <input type="hidden" name="crit[{{ forloop.counter }}]" />
                 </td>
-                <td id="{{ slot.id }}_haste">
+                <td class="details" style="display:none;" id="{{ slot.id }}_haste">
                   <span></span>
                   <input type="hidden" name="haste[{{ forloop.counter }}]" />
                 </td>
-                <td id="{{ slot.id }}_mastery">
+                <td class="details" style="display:none;" id="{{ slot.id }}_mastery">
                   <span></span>
                   <input type="hidden" name="mastery[{{ forloop.counter }}]" />
                 </td>
-                <td id="{{ slot.id }}_multistrike">
+                <td class="details" style="display:none;" id="{{ slot.id }}_multistrike">
                   <span></span>
                   <input type="hidden" name="multistrike[{{ forloop.counter }}]" />
                 </td>
-                <td id="{{ slot.id }}_versatility">
+                <td class="details" style="display:none;" id="{{ slot.id }}_versatility">
                   <span></span>
                   <input type="hidden" name="versatility[{{ forloop.counter }}]" />
                 </td>
-                <td id="{{ slot.id }}_source">
+                <td class="details" style="display:none;" id="{{ slot.id }}_source">
                   <span></span>
                 </td>
-                <td id="{{ slot.id }}_zone">
+                <td class="details" style="display:none;" id="{{ slot.id }}_zone">
                   <span></span>
                 </td>
               </tr>
@@ -206,7 +208,11 @@
 </div>
 
   
-<script type="text/javascript">  
+<script type="text/javascript">
+  $('#detailsToggler').click(function() {
+    $('.details').toggle();
+  });
+  
   function item_switch(slot,val) {
     var base_media_url = 'http://us.media.blizzard.com/wow/icons/18/';
     var gear_table_val = val && gear_table[val.replace("'","\'")] || "";
