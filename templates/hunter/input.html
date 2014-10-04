@@ -35,14 +35,14 @@
                  WF
                 </a>
               </th>
-              <th class="details" style="display:none;">Agi</th>
-              <th class="details" style="display:none;">Crt</th>
-              <th class="details" style="display:none;">Hst</th>
-              <th class="details" style="display:none;">Mas</th>
-              <th class="details" style="display:none;">Mst</th>
-              <th class="details" style="display:none;">Ver</th>
-              <th class="details" style="display:none;">Boss/Source</th>
-              <th class="details" style="display:none;">Zone</th>
+              <th class="details">Agi</th>
+              <th class="details">Crt</th>
+              <th class="details">Hst</th>
+              <th class="details">Mas</th>
+              <th class="details">Mst</th>
+              <th class="details">Ver</th>
+              <th class="details">Boss/Source</th>
+              <th class="details">Zone</th>
             </tr>
           </thead>
           <tbody>
@@ -62,34 +62,34 @@
                 <td>{{ slot.difficulty }}</td>
                 <td>{{ slot.socket }}</td>
                 <td>{{ slot.warforged }}</td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_agility">
+                <td class="details" id="{{ slot.id }}_agility">
                   <span></span>
                   <input type="hidden" name="agility[{{ forloop.counter }}]" />
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_crit">
+                <td class="details" id="{{ slot.id }}_crit">
                   <span></span>
                   <input type="hidden" name="crit[{{ forloop.counter }}]" />
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_haste">
+                <td class="details" id="{{ slot.id }}_haste">
                   <span></span>
                   <input type="hidden" name="haste[{{ forloop.counter }}]" />
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_mastery">
+                <td class="details" id="{{ slot.id }}_mastery">
                   <span></span>
                   <input type="hidden" name="mastery[{{ forloop.counter }}]" />
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_multistrike">
+                <td class="details" id="{{ slot.id }}_multistrike">
                   <span></span>
                   <input type="hidden" name="multistrike[{{ forloop.counter }}]" />
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_versatility">
+                <td class="details" id="{{ slot.id }}_versatility">
                   <span></span>
                   <input type="hidden" name="versatility[{{ forloop.counter }}]" />
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_source">
+                <td class="details" id="{{ slot.id }}_source">
                   <span></span>
                 </td>
-                <td class="details" style="display:none;" id="{{ slot.id }}_zone">
+                <td class="details" id="{{ slot.id }}_zone">
                   <span></span>
                 </td>
               </tr>
@@ -193,6 +193,8 @@
            complicate it so I opted to focus just on WoD. This means the following:</p>
         <ul>
           <li>Normal, heroic, and mythic versions of gear actually has the same item id, so we can't go by name/id alone!</li>
+          <li>Don't use the heroic/mythic or warforged toggles for Mists of Pandaria gear. These have separate ids, so we use that. This feature is meant
+            for Warlords of Draenor only</li>
           <li>Once an item is selected, you should choose a normal, heroic, or mythic version if applicable. Normal is the default
             so if it's something like quest gear you can just leave this value unchanged</li>
           <li>Warforged gear is also an option for raid gear, again using the same id.</li>
@@ -291,14 +293,18 @@
     // put our equipped gear into gear_table if not already there
     for (i=0;i<equipped.length;i++) {
       var $name = equipped[i]['name'];
-      if (!($name in gear_table)) {
+      var $id = equipped[i]['id'];
+      if (!($id in gear_table)) {
         console.log(equipped[i]);
-        gear_table[equipped[i]['name']] = {'agility':equipped[i]['agility'],
+        gear_table[equipped[i]['id']] = {'agility':equipped[i]['agility'],
                                            'crit':equipped[i]['crit'],
                                            'haste':equipped[i]['haste'],
                                            'mastery':equipped[i]['mastery'],
                                            'multistrike':equipped[i]['multistrike'],
                                            'versatility':equipped[i]['versatility'],
+                                           'weapon_min':equipped[i]['minw'],
+                                           'weapon_max':equipped[i]['maxw'],
+                                           'weapon_speed':equipped[i]['speedw'],
                                            'socket':'',
                                            'icon':equipped[i]['icon'],
                                            'source':'(equipped)',
@@ -306,11 +312,11 @@
         // add it as an option
         $('#id_'+equipped[i]['slot'])
                         .append($('<option>')
-                        .attr('value',equipped[i]['name'])
+                        .attr('value',equipped[i]['id'])
                         .text(equipped[i]['name']));        
       }
       // select it
-      $('#id_'+equipped[i]['slot']).val(equipped[i]['name']);  
+      $('#id_'+equipped[i]['slot']).val(equipped[i]['id']);  
     };
       
     // set up onchange actions for items and difficulty toggles, and initialize

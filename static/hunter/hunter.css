@@ -14,7 +14,7 @@
   display: inline;
 }
 
-#detailsToggler:hover {
+#detailsToggler:hover, #detailsToggler:focus {
   background: none;
   border: none;
 }

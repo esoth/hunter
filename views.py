@@ -1,6 +1,7 @@
 from django import forms
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
+from django.http.request import QueryDict
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext, loader
 from django.views import generic
@@ -51,6 +52,7 @@ class ArmoryModelForm(ModelForm):
       model = ArmoryModel
 
 class GearEquipModelForm(ModelForm):
+    excludes = []
     class Meta:
       model = GearEquipModel
 
@@ -203,12 +205,17 @@ def processEquippedGear(data):
            'weapon_speed':3.0,
            'icon':'',
            'equipped':[],
+           'name':'',
            }
   # sockets
   sockets = []
   for s in SLOTS:
+    sss = s
     if data[s]:
-      _data['equipped'].append({'id':int(data[s]),'bonus':''})
+      try:
+        _data['equipped'].append({'id':int(data[s]),'bonus':''})
+      except ValueError: # unknown gear
+        pass
     if data.get(s+'_socket'):
       gem = Gem.objects.filter(id=data[s+'_socket'])
       if gem:
@@ -285,7 +292,7 @@ def process_armory(armory_form):
   region = armory_form['region']
   server = armory_form['server']
   character = armory_form['character']
-  spec = armory_form['spec']
+  spec = armory_form.get('spec')
   kwargs = {'region':region,
             'server':armory_form['server'],
             'character':armory_form['character'],
@@ -293,11 +300,26 @@ def process_armory(armory_form):
   url = 'https://%(region)s.api.battle.net/wow/character/%(server)s/%(character)s?apikey=%(apikey)s&fields=stats,talents,items' % kwargs
   title = '%s of %s (%s)' % (character, SERVER_NAMES[server], region)
   data = json.load(urlopen(url.encode('utf-8')))
+  if data.get('status') == 'nok':
+    return None
+  spc = not spec and 1 or 0
+  _spec = data['talents'][spc]['spec']['order']
+  talents = {}
+  for talent in data['talents'][spc]['talents']:
+    talents['talent%d' % (talent['tier']+1)] = talent['column']
+    
+  talent4 = talents.get('talent4') or 0
+  talent5 = talents.get('talent5') or 0
+  talent6 = talents.get('talent6') or 0
+  talent7 = talents.get('talent7') or 0
+  race = data['race']
 
   def squish(v):
     return int(v*.0390)
 
   def build_item(slot):
+    if not slot:
+      return {}
     attrs = {}
     for stat in slot['stats']:
       if stat['stat'] in stats_used:
@@ -321,21 +343,27 @@ def process_armory(armory_form):
       attrs['speed'] = slot['weaponInfo']['weaponSpeed']
     return attrs
 
-  armory = {'head':build_item(data['items']['head']),
-            'neck':build_item(data['items']['neck']),
-            'shoulders':build_item(data['items']['shoulder']),
-            'chest':build_item(data['items']['chest']),
-            'back':build_item(data['items']['back']),
-            'wrists':build_item(data['items']['wrist']),
-            'hands':build_item(data['items']['hands']),
-            'waist':build_item(data['items']['waist']),
-            'legs':build_item(data['items']['legs']),
-            'feet':build_item(data['items']['feet']),
-            'ring1':build_item(data['items']['finger1']),
-            'ring2':build_item(data['items']['finger2']),
-            'trinket1':build_item(data['items']['trinket1']),
-            'trinket2':build_item(data['items']['trinket2']),
-            'weapon':build_item(data['items']['mainHand'])}
+  armory = {'slots':{'head':build_item(data['items'].get('head')),
+            'neck':build_item(data['items'].get('neck')),
+            'shoulders':build_item(data['items'].get('shoulder')),
+            'chest':build_item(data['items'].get('chest')),
+            'back':build_item(data['items'].get('back')),
+            'wrists':build_item(data['items'].get('wrist')),
+            'hands':build_item(data['items'].get('hands')),
+            'waist':build_item(data['items'].get('waist')),
+            'legs':build_item(data['items'].get('legs')),
+            'feet':build_item(data['items'].get('feet')),
+            'ring1':build_item(data['items'].get('finger1')),
+            'ring2':build_item(data['items'].get('finger2')),
+            'trinket1':build_item(data['items'].get('trinket1')),
+            'trinket2':build_item(data['items'].get('trinket2')),
+            'weapon':build_item(data['items'].get('mainHand'))},
+            'spec':_spec,
+            'talent4':talent4,
+            'talent5':talent5,
+            'talent6':talent6,
+            'talent7':talent7,
+            'race':race}
   return armory
 
 
@@ -377,30 +405,63 @@ def CalcView(request):
                   'difficulty':gear[s+'_difficulty']})
 
   equipped = []
-  minw = maxw = speedw = 0
+  minw = maxw = 0
+  speedw = 3
   title = ''
 
+  notfound = ''
   if armory_form.data:
     armory = process_armory(armory_form.data)
-
-    for slot,attrs in armory.items():
-      if slot == 'weapon':
-        minw = attrs['min']
-        maxw = attrs['max']
-        speedw = attrs['speed']
-      equipped.append({'id':attrs['id'],
-                    'agility':attrs.get('agility',0),
-                    'crit':attrs.get('crit',0),
-                    'haste':attrs.get('haste',0),
-                    'mastery':attrs.get('mastery',0),
-                    'multistrike':attrs.get('multistrike',0),
-                    'versatility':attrs.get('versatility',0),
-                    'icon':attrs.get('icon','inv_misc_questionmark'),
-                    'name':attrs.get('name',0),
-                    'slot':slot,
-                    'ilvl':attrs.get('ilvl',0),
-        })
+    if not armory:
+      notfound = '/n'.join([armory_form.data['region'],armory_form.data['server'],armory_form.data['character']])
+    else:
+      metastring = 'race=%d&spec=%d&talent4=%d&talent5=%d&talent6=%d&talent7=%d' % (armory['race'],
+                                                                                    armory['spec'],
+                                                                                    armory['talent4'],
+                                                                                    armory['talent5'],
+                                                                                    armory['talent6'],
+                                                                                    armory['talent7'])
+      meta = HunterModelForm(QueryDict(metastring))
+  
+      for slot,attrs in armory['slots'].items():
+        if slot == 'weapon':
+          minw = attrs.get('min',0)
+          maxw = attrs.get('max',0)
+          speedw = attrs.get('speed',3)
+        equipped.append({'id':attrs.get('id') or '(Not equipped - %s)' % slot,
+                      'agility':attrs.get('agility',0),
+                      'crit':attrs.get('crit',0),
+                      'haste':attrs.get('haste',0),
+                      'mastery':attrs.get('mastery',0),
+                      'minw':minw,
+                      'maxw':maxw,
+                      'speedw':speedw,
+                      'multistrike':attrs.get('multistrike',0),
+                      'versatility':attrs.get('versatility',0),
+                      'icon':attrs.get('icon','inv_misc_questionmark'),
+                      'name':attrs.get('name') or '(Not equipped)',
+                      'slot':slot,
+                      'ilvl':attrs.get('ilvl',0),
+          })
   elif request.method == 'POST':
+    gear_table_ids = [str(i) for i in GearItem.objects.all().values_list('id',flat=True)]
+    for slot in SLOTS: # if custom gear was imported, we need to handle it
+      if gear.data[slot] not in gear_table_ids:
+        equipped.append({'id':gear.data[slot],
+                    'agility':gear.data['agility[%d]' % (SLOTS.index(slot)+1)],
+                    'crit':gear.data['crit[%d]' % (SLOTS.index(slot)+1)],
+                    'haste':gear.data['haste[%d]' % (SLOTS.index(slot)+1)],
+                    'mastery':gear.data['mastery[%d]' % (SLOTS.index(slot)+1)],
+                    'minw':gear.data['weapon_min'],
+                    'maxw':gear.data['weapon_max'],
+                    'speedw':gear.data['weapon_speed'],
+                    'multistrike':gear.data['multistrike[%d]' % (SLOTS.index(slot)+1)],
+                    'versatility':gear.data['versatility[%d]' % (SLOTS.index(slot)+1)],
+                    'icon':'inv_misc_questionmark',
+                    'name':'(armory import - %s)' % slot,
+                    'slot':slot,
+                    'ilvl':0,
+        })
     gear = processEquippedGear(gear.data)
     meta = HunterModelForm(request.POST)
     bmo = BMOptionsForm(request.POST)
@@ -415,6 +476,7 @@ def CalcView(request):
 
   return render(request, 'hunter/calc.html',
                 {'slots': slots,
+                 'notfound':notfound,
                  'armory_form': armory_form,
                  'bmo': bmo,
                  'mmo': mmo,
