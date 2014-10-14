@@ -413,7 +413,7 @@ def CalcView(request):
   if armory_form.data:
     armory = process_armory(armory_form.data)
     if not armory:
-      notfound = '/n'.join([armory_form.data['region'],armory_form.data['server'],armory_form.data['character']])
+      notfound = '/'.join([armory_form.data['region'],armory_form.data['server'],armory_form.data['character']])
     else:
       metastring = 'race=%d&spec=%d&talent4=%d&talent5=%d&talent6=%d&talent7=%d' % (armory['race'],
                                                                                     armory['spec'],

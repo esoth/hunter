@@ -12,6 +12,14 @@ tier5=[(TIER5.index(t),t) for t in TIER5]
 tier6=[(TIER6.index(t),t) for t in TIER6]
 tier7=[(TIER7.index(t),t) for t in TIER7]
 
+enchants = (('','(none)'),
+            ('crit','Critical Strike'),
+            ('haste','Haste'),
+            ('mastery','Mastery'),
+            ('multistrike','Multistrike'),
+            ('versatility','Versatility'),
+            ('spec','Use spec attunement'),)
+
 class HunterModel(models.Model):
     race = models.IntegerField(default=4, # Night Elf
                             choices=RACES,
@@ -31,6 +39,10 @@ class HunterModel(models.Model):
     talent7 = models.IntegerField(default=tier7[0],
                                verbose_name="Talents - level 100",
                                choices=tier7,max_length=30)
+    enchants = models.CharField(choices=enchants,
+                               verbose_name="Enchant/Food stat",
+                            default='spec',blank=True,
+                            max_length=30)
 
 class ArmoryModel(models.Model):
     region = models.CharField(choices=REGIONS,
@@ -87,11 +99,6 @@ difficulty_options = (('normal','Normal/None'),
                       ('heroic','Heroic'),
                       ('mythic','Mythic'),)
 
-
-try:
-  gem_choices = [('','(None)')]+[(g.id,g.name) for g in Gem.objects.all().order_by('id')]
-except:
-  gem_choices = [('','(None)')]
 
 DEFAULT_WEAPON = 113652 # Crystalline Branch of the Brackenspore
 DEFAULT_HEAD = 113863 # Gronn-Skin Crown
