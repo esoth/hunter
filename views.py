@@ -157,28 +157,22 @@ def ArmoryView(request, region, server, character, spec=None):
 def GearTableView(request):
   gear_table = {'':{'source':'','agility':'','crit':'','haste':'','mastery':'','multistrike':'','versatility':'','zone':'','source':''}}
 
-  def squish(id,v,weapon=False):
-    if id < 109104:
-      return weapon and int(v*.0390)/2 or int(v*.0390)
-    else:
-      return v
-
   for g in GearItem.objects.all():
     gear_table[g.id] = {'zone':g.zone,
                         'name':g.name,
                         'source':g.source,
-                        'agility':squish(g.id,g.agility),
-                        'crit':squish(g.id,g.crit),
-                        'haste':squish(g.id,g.haste),
-                        'mastery':squish(g.id,g.mastery),
-                        'multistrike':squish(g.id,g.multistrike),
-                        'versatility':squish(g.id,g.versatility),
+                        'agility':g.agility,
+                        'crit':g.crit,
+                        'haste':g.haste,
+                        'mastery':g.mastery,
+                        'multistrike':g.multistrike,
+                        'versatility':g.versatility,
                         'ilvl':g.ilvl,
                         'icon':g.icon,
                         'zone':g.zone,
                         'source':g.source,
-                        'weapon_min':squish(g.id,g.weapon_min,weapon=True),
-                        'weapon_max':squish(g.id,g.weapon_max,weapon=True),
+                        'weapon_min':g.weapon_min,
+                        'weapon_max':g.weapon_max,
                         'weapon_speed':g.weapon_speed}
   try:
     for g in Gem.objects.all():
@@ -314,22 +308,21 @@ def process_armory(armory_form):
   talent7 = talents.get('talent7') or 0
   race = data['race']
 
-  def squish(v):
-    return int(v*.0390)
-
   def build_item(slot):
     if not slot:
       return {}
     attrs = {}
     for stat in slot['stats']:
       if stat['stat'] in stats_used:
-        attrs[stats_used[stat['stat']]] = squish(stat['amount'])
+        attrs[stats_used[stat['stat']]] = stat['amount']
     if 'gem1' in slot['tooltipParams']:
       attrs['gem'] = slot['tooltipParams']['gem1']
     attrs['id'] = slot['id']
     attrs['name'] = slot['name']
     attrs['ilvl'] = slot['itemLevel']
     attrs['icon'] = slot['icon']
+    attrs['context'] = slot['context']
+    attrs['bonuses'] = slot['bonusLists']
 
     # check our database to add heroic to ilvls below 600
     if (attrs['ilvl'] <= 600 or 'Fen-Yu' in attrs['name']) and GearItem.objects.filter(id=slot['id']):
@@ -338,8 +331,8 @@ def process_armory(armory_form):
         attrs['name'] += ' (%s)' % match.nameDescription
 
     if 'weaponInfo' in slot:
-      attrs['min'] = squish(slot['weaponInfo']['damage']['exactMin'])/2
-      attrs['max'] = squish(slot['weaponInfo']['damage']['exactMax'])/2
+      attrs['min'] = slot['weaponInfo']['damage']['exactMin']/2
+      attrs['max'] = slot['weaponInfo']['damage']['exactMax']/2
       attrs['speed'] = slot['weaponInfo']['weaponSpeed']
     return attrs
 
@@ -440,6 +433,8 @@ def CalcView(request):
                       'versatility':attrs.get('versatility',0),
                       'icon':attrs.get('icon','inv_misc_questionmark'),
                       'name':attrs.get('name') or '(Not equipped)',
+                      'context':attrs.get('context'),
+                      'warforged':attrs.get('bonuses') and 448 in attrs['bonuses'],
                       'slot':slot,
                       'ilvl':attrs.get('ilvl',0),
           })

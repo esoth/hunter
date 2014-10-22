@@ -28,7 +28,7 @@
               <th>Slot</th>
               <th>ilvl</th>
               <th>Item</th>
-              <th>Bonus</th>
+              <th>Context</th>
               <th>Socket</th>
               <th>
                 <a class="step-tooltip" data-toggle="tooltip" data-placement="top" title="Warforged">
@@ -165,7 +165,7 @@
               <h3 class="panel-title">Warning</h3>
             </div>
             <div class="panel-body">
-              Your stats will get "squished" - this isn't particularly useful on a level 90 character!
+              Item upgrades for level 90s are ignored - sorry!
             </div>
           </div>
           {{ armory_form.as_p }}
@@ -221,9 +221,6 @@
     var stats = new Array("agility","crit","haste","mastery","multistrike","versatility","source","zone");
     for (i=0;i<=stats.length;i++) {
       if (gear_table_val) {
-        if (gear_table_val['ilvl'] >= 600) {
-          base_media_url = 'http://wow.zamimg.com/images/wow/icons/small/';
-        }
         $('#'+slot+'_'+stats[i]+' span').html(gear_table_val[stats[i]]);
         $('#'+slot+'_'+stats[i]+' input').val(gear_table_val[stats[i]]);
         $('#icon_'+slot).attr('src',base_media_url+gear_table_val['icon']+'.jpg');
@@ -258,11 +255,11 @@
     ilvl = gear_table_val['ilvl']
     if (val == 'heroic') {
       factor = 1.15 * warforged;
-      ilvl += 15
+      ilvl += 10
     }
     else if (val == 'mythic') {
       factor = 1.15 * 1.15 * warforged;
-      ilvl += 30
+      ilvl += 20
     }
     if (warforged != 1) {
       ilvl += 6;
@@ -295,7 +292,7 @@
       var $name = equipped[i]['name'];
       var $id = equipped[i]['id'];
       if (!($id in gear_table)) {
-        console.log(equipped[i]);
+        console.log('Could not find: ' + $id)
         gear_table[equipped[i]['id']] = {'agility':equipped[i]['agility'],
                                            'crit':equipped[i]['crit'],
                                            'haste':equipped[i]['haste'],
@@ -317,6 +314,15 @@
       }
       // select it
       $('#id_'+equipped[i]['slot']).val(equipped[i]['id']);  
+      if( equipped[i]['warforged'] == true ) {
+        $('#id_'+equipped[i]['slot']+'_warforged').attr('checked','checked')
+      }
+      if( equipped[i]['context'] == 'raid-heroic' ) {
+        $('#id_'+equipped[i]['slot']+'_difficulty').val('heroic')
+      }
+      else if( equipped[i]['context'] == 'raid-mythic' ) {
+        $('#id_'+equipped[i]['slot']+'_difficulty').val('mythic')
+      }
     };
       
     // set up onchange actions for items and difficulty toggles, and initialize

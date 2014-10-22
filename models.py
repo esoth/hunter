@@ -95,7 +95,7 @@ class AOEOptionsModel(models.Model):
                          verbose_name="Min focus to cast main nukes",
                          max_length=3)
 
-difficulty_options = (('normal','Normal/None'),
+difficulty_options = (('normal','Normal/LFR'),
                       ('heroic','Heroic'),
                       ('mythic','Mythic'),)
 
@@ -120,7 +120,7 @@ class GearEquipModel(models.Model):
     weapon = models.ForeignKey(GearItem,
                                related_name='gearequip_weapon',
                                default=DEFAULT_WEAPON,
-                               limit_choices_to={'slot__in':(15,25)})
+                               limit_choices_to={'slot__in':(15,26)})
     weapon_difficulty = models.CharField(choices=difficulty_options,
                             default='',
                             max_length=30)
