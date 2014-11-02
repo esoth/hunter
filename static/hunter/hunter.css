@@ -45,6 +45,17 @@
   color: white;
 }
 
+table th.tablesorter-header {
+  cursor: pointer;
+  color: white;
+  background-color: #333;
+}
+
+#item-banner .item-quality2,
+#items-table a .item-quality2 {
+  color: #00FF00;
+}
+
 #item-banner .item-quality3,
 #items-table a .item-quality3 {
   color: #0070DD;
@@ -173,7 +184,7 @@ td.ability_rotation {
   text-align: center;
 }
 
-td.kill-command_rotation {  
+td.kill-command_rotation {
   background: linear-gradient(#BE593D, #F8C487, #BE593D);
 }
 
@@ -268,7 +279,7 @@ td.stampede_rotation {
 td.a-murder-of-crows_rotation {
   background-image: linear-gradient(#7BC6CD, #527387);
 }
-  
+
 
 #footer {
   border-top: 1px solid #aaaaaa;
@@ -293,4 +304,4 @@ td.a-murder-of-crows_rotation {
 #sockets li {
   padding-top:0.25em;
   padding-bottom:0.25em;
-}  
+}

@@ -95,9 +95,9 @@ class AOEOptionsModel(models.Model):
                          verbose_name="Min focus to cast main nukes",
                          max_length=3)
 
-difficulty_options = (('normal','Normal/LFR'),
-                      ('heroic','Heroic'),
-                      ('mythic','Mythic'),)
+difficulty_options = (('raid-normal','Normal'),
+                      ('raid-heroic','Heroic'),
+                      ('raid-mythic','Mythic'),)
 
 
 DEFAULT_WEAPON = 113652 # Crystalline Branch of the Brackenspore
@@ -122,7 +122,7 @@ class GearEquipModel(models.Model):
                                default=DEFAULT_WEAPON,
                                limit_choices_to={'slot__in':(15,26)})
     weapon_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     weapon_socket = models.ForeignKey(Gem,related_name='gearequip_weapon_gem')
     weapon_warforged = models.BooleanField(default=False,)
@@ -132,7 +132,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_HEAD,
                              limit_choices_to={'slot':1})
     head_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     head_socket = models.ForeignKey(Gem,related_name='gearequip_head_gem')
     head_warforged = models.BooleanField(default=False,)
@@ -142,7 +142,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_NECK,
                              limit_choices_to={'slot':2})
     neck_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     neck_socket = models.ForeignKey(Gem,related_name='gearequip_neck_gem')
     neck_warforged = models.BooleanField(default=False,)
@@ -152,7 +152,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_SHOULDERS,
                              limit_choices_to={'slot':3})
     shoulders_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     shoulders_socket = models.ForeignKey(Gem,related_name='gearequip_shoulders_gem')
     shoulders_warforged = models.BooleanField(default=False,)
@@ -162,7 +162,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_BACK,
                              limit_choices_to={'slot':16})
     back_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     back_socket = models.ForeignKey(Gem,related_name='gearequip_back_gem')
     back_warforged = models.BooleanField(default=False,)
@@ -172,7 +172,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_CHEST,
                              limit_choices_to={'slot':5})
     chest_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     chest_socket = models.ForeignKey(Gem,related_name='gearequip_chest_gem')
     chest_warforged = models.BooleanField(default=False,)
@@ -182,7 +182,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_WRISTS,
                              limit_choices_to={'slot':9})
     wrists_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     wrists_socket = models.ForeignKey(Gem,related_name='gearequip_wrists_gem')
     wrists_warforged = models.BooleanField(default=False,)
@@ -192,7 +192,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_HANDS,
                              limit_choices_to={'slot':10})
     hands_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     hands_socket = models.ForeignKey(Gem,related_name='gearequip_hands_gem')
     hands_warforged = models.BooleanField(default=False,)
@@ -202,7 +202,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_WAIST,
                              limit_choices_to={'slot':6})
     waist_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     waist_socket = models.ForeignKey(Gem,related_name='gearequip_waist_gem')
     waist_warforged = models.BooleanField(default=False,)
@@ -212,7 +212,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_LEGS,
                              limit_choices_to={'slot':7})
     legs_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     legs_socket = models.ForeignKey(Gem,related_name='gearequip_legs_gem')
     legs_warforged = models.BooleanField(default=False,)
@@ -222,7 +222,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_FEET,
                              limit_choices_to={'slot':8})
     feet_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     feet_socket = models.ForeignKey(Gem,related_name='gearequip_feet_gem')
     feet_warforged = models.BooleanField(default=False,)
@@ -232,7 +232,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_RING1,
                              limit_choices_to={'slot':11})
     ring1_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     ring1_socket = models.ForeignKey(Gem,related_name='gearequip_ring1_gem')
     ring1_warforged = models.BooleanField(default=False,)
@@ -242,7 +242,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_RING2,
                              limit_choices_to={'slot':11})
     ring2_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     ring2_socket = models.ForeignKey(Gem,related_name='gearequip_ring2_gem')
     ring2_warforged = models.BooleanField(default=False,)
@@ -252,7 +252,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_TRINKET1,
                              limit_choices_to={'slot':12})
     trinket1_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     trinket1_socket = models.ForeignKey(Gem,related_name='gearequip_trinket1_gem')
     trinket1_warforged = models.BooleanField(default=False,)
@@ -262,7 +262,7 @@ class GearEquipModel(models.Model):
                              default=DEFAULT_TRINKET2,
                              limit_choices_to={'slot':12})
     trinket2_difficulty = models.CharField(choices=difficulty_options,
-                            default='',
+                            default='raid-normal',
                             max_length=30)
     trinket2_socket = models.ForeignKey(Gem,related_name='gearequip_trinket2_gem')
     trinket2_warforged = models.BooleanField(default=False,)

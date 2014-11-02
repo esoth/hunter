@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
+
     {% load staticfiles %}
-    
+
     <link rel="icon" href="{% static favicon.ico %}favicon.ico" type="image/x-icon"/>
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
@@ -17,10 +17,11 @@
     <script src="//code.highcharts.com/modules/exporting.js"></script>
     <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
     <script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": false, "renamelinks": false }</script>
-    
+    <script type="text/javascript" src="{% static "jquery.tablesorter.min.js" %}"></script>
+
     {% block title %}Esoth's Hunter Tools{% endblock %}
   </head>
-  
+
   <body>
 
     <!-- Fixed navbar -->
@@ -46,22 +47,22 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
-    
+
     <div id="sub-banner">
-    
+
     </div>
-    
-    
+
+
     <div class="container-fluid" id="main-body">
       {% block content %}Welcome to the Proving Grounds!{% endblock %}
     </div>
-    
+
     <div id="footer">
       <div class="container">
         <p class="muted credit">2014, by Esoth</p>
       </div>
     </div>
-    
+
     <script type="text/javascript">
       $('.step-tooltip').tooltip();
       $('.step-tooltip').css('cursor','pointer');
@@ -71,10 +72,10 @@
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    
+
       ga('create', 'UA-54616502-1', 'auto');
       ga('send', 'pageview');
-    
+
     </script>
   </body>
 </html>

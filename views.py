@@ -154,36 +154,57 @@ def ArmoryView(request, region, server, character, spec=None):
   pass
   # do a redirect
 
+def contextsort(val):
+  ranks = ['raid-mythic','raid-heroic','raid-normal','dungeon-heroic']
+  if val and val[0] and val[0] in ranks:
+    return ranks.index(val[0])
+  return len(ranks)
+
 def GearTableView(request):
   gear_table = {'':{'source':'','agility':'','crit':'','haste':'','mastery':'','multistrike':'','versatility':'','zone':'','source':''}}
 
   for g in GearItem.objects.all():
+    contexts = {}
+    for context in g.gearcontext_set.all():
+      contexts[context.context] = {'agility':context.agility,
+                           'crit':context.crit,
+                           'haste':context.haste,
+                           'mastery':context.mastery,
+                           'multistrike':context.multistrike,
+                           'versatility':context.versatility,
+                           'weapon_min':context.weapon_min,
+                           'weapon_max':context.weapon_max,
+                           'weapon_speed':context.weapon_speed,
+                           'ilvl':context.ilvl,
+                           'contextPretty':context.contextPretty()}
+    if not contexts:
+      contexts[g.nameDescription or 'na'] = {'agility':g.agility,
+                           'crit':g.crit,
+                           'haste':g.haste,
+                           'mastery':g.mastery,
+                           'multistrike':g.multistrike,
+                           'versatility':g.versatility,
+                           'weapon_min':g.weapon_min,
+                           'weapon_max':g.weapon_max,
+                           'weapon_speed':g.weapon_speed,
+                           'ilvl':g.ilvl,
+                           'contextPretty':g.nameDescription or '(N/A)'}
+    contextOpts = sorted([(k,v['contextPretty']) for k,v in contexts.items()], key=contextsort, reverse=True)
     gear_table[g.id] = {'zone':g.zone,
                         'name':g.name,
                         'source':g.source,
-                        'agility':g.agility,
-                        'crit':g.crit,
-                        'haste':g.haste,
-                        'mastery':g.mastery,
-                        'multistrike':g.multistrike,
-                        'versatility':g.versatility,
-                        'ilvl':g.ilvl,
                         'icon':g.icon,
                         'zone':g.zone,
                         'source':g.source,
-                        'weapon_min':g.weapon_min,
-                        'weapon_max':g.weapon_max,
-                        'weapon_speed':g.weapon_speed}
-  try:
-    for g in Gem.objects.all():
-      gear_table[g.name] = {'agility':g.agility,
-           'crit':g.crit,
-           'haste':g.haste,
-           'mastery':g.mastery,
-           'multistrike':g.multistrike,
-           'versatility':g.versatility}
-  except:
-    pass
+                        'contexts':contexts,
+                        'contextOpts':contextOpts}
+  for g in Gem.objects.all():
+    gear_table[g.name] = {'agility':g.agility,
+         'crit':g.crit,
+         'haste':g.haste,
+         'mastery':g.mastery,
+         'multistrike':g.multistrike,
+         'versatility':g.versatility}
   return HttpResponse(json.dumps(gear_table)) #, mimetype='application/json')
 
 def processEquippedGear(data):
@@ -242,8 +263,9 @@ def process_form_data(gear,metadata,bmo,mmo,svo,aeo):
   meta.talent5 = int(metadata.data['talent5'] or 0)
   meta.talent6 = int(metadata.data['talent6'] or 0)
   meta.talent7 = int(metadata.data['talent7'] or 0)
+  meta.enchants = metadata.data['enchants']
 
-  hunter = Hunter(meta)
+  hunter = Hunter(meta,gear['equipped'])
   hunter.weaponmin = int(gear['weapon_min'])
   hunter.weaponmax = int(gear['weapon_max'])
   hunter.weaponspeed = float(gear['weapon_speed'])
@@ -301,7 +323,7 @@ def process_armory(armory_form):
   talents = {}
   for talent in data['talents'][spc]['talents']:
     talents['talent%d' % (talent['tier']+1)] = talent['column']
-    
+
   talent4 = talents.get('talent4') or 0
   talent5 = talents.get('talent5') or 0
   talent6 = talents.get('talent6') or 0
@@ -415,7 +437,7 @@ def CalcView(request):
                                                                                     armory['talent6'],
                                                                                     armory['talent7'])
       meta = HunterModelForm(QueryDict(metastring))
-  
+
       for slot,attrs in armory['slots'].items():
         if slot == 'weapon':
           minw = attrs.get('min',0)
@@ -439,9 +461,9 @@ def CalcView(request):
                       'ilvl':attrs.get('ilvl',0),
           })
   elif request.method == 'POST':
-    gear_table_ids = [str(i) for i in GearItem.objects.all().values_list('id',flat=True)]
+    #gear_table_ids = [str(i) for i in GearItem.objects.all().values_list('id',flat=True)]
     for slot in SLOTS: # if custom gear was imported, we need to handle it
-      if gear.data[slot] not in gear_table_ids:
+      #if gear.data[slot] not in gear_table_ids:
         equipped.append({'id':gear.data[slot],
                     'agility':gear.data['agility[%d]' % (SLOTS.index(slot)+1)],
                     'crit':gear.data['crit[%d]' % (SLOTS.index(slot)+1)],
@@ -452,6 +474,7 @@ def CalcView(request):
                     'speedw':gear.data['weapon_speed'],
                     'multistrike':gear.data['multistrike[%d]' % (SLOTS.index(slot)+1)],
                     'versatility':gear.data['versatility[%d]' % (SLOTS.index(slot)+1)],
+                    'context':gear.data[slot+'_difficulty'],
                     'icon':'inv_misc_questionmark',
                     'name':'(armory import - %s)' % slot,
                     'slot':slot,
@@ -464,7 +487,7 @@ def CalcView(request):
     mmo = MMOptionsForm(request.POST)
     aeo = AOEOptionsForm(request.POST)
 
-    #meta,hunter,spelltable,stattable,proc_info,options = 
+    #meta,hunter,spelltable,stattable,proc_info,options =
     data = process_form_data(gear,meta,bmo,svo,mmo,aeo)
     single,dummy,totals = dps.runner(data['hunter'],data['options'],lastcalc=float(request.POST.get('lastcalc') or 0))
     aoe,dummy,aoetotals = dps.runner(data['hunter'],data['options'],aoe=True)

@@ -12,7 +12,7 @@
     <button class="btn btn-success" data-toggle="modal" data-target="#equip_help">
       Help
     </button>
-    
+
     <a id="detailsToggler" href="javascript:void(0);">[ show/hide details ]</a>
   </li>
 </ul>
@@ -20,7 +20,7 @@
   <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
   <div class="tab-content" id="subtabs">
     <div class="tab-pane fade in active" id="subtabs-stats">
-  
+
         {% csrf_token %}
         <table class="table">
           <thead>
@@ -109,9 +109,9 @@
                     </span>
                     <label for="weapon_speed">Weapon Speed:</label>
                     <span id="weapon_speed">
-                      <input type="hidden" name="weapon_speed" value="{{ speedw }}" />  
+                      <input type="hidden" name="weapon_speed" value="{{ speedw }}" />
                       <span>{{ speedw }}</span>
-                    </span>            
+                    </span>
                   </td>
                 </tr>
               {% endif %}
@@ -123,7 +123,7 @@
       <h3>Talents/Race</h3>
       <table class="table">
         {{ meta.as_table }}
-      </table>    
+      </table>
       <h3>Beast Master</h3>
       <table class="table">
         {{ bmo.as_table }}
@@ -142,7 +142,7 @@
       </table>
     </div>
   </div>
-  
+
   <button type="submit" class="btn btn-success">
     <span class="glyphicon glyphicon-screenshot"></span>
     Calculate
@@ -186,7 +186,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <h4 class="modal-title" id="myModalLabel">What Do These Options Mean?</h4>
-      </div>          
+      </div>
       <div class="modal-body">
         <p>This page is designed with typical Warlords of Draenor gear in mind. Some of these options/toggles can be used on Mists of Pandaria
            gear in this form, but it makes no sense to do so. Adapting this form to accomodate both MoP and WoD gear would over
@@ -209,99 +209,134 @@
   </div>
 </div>
 
-  
+
 <script type="text/javascript">
   $('#detailsToggler').click(function() {
     $('.details').toggle();
   });
-  
-  function item_switch(slot,val) {
+
+  function item_switch(slot) {
+    val = $('#id_'+slot).val();
     var base_media_url = 'http://us.media.blizzard.com/wow/icons/18/';
     var gear_table_val = val && gear_table[val.replace("'","\'")] || "";
-    var stats = new Array("agility","crit","haste","mastery","multistrike","versatility","source","zone");
+
+    // update contexts
+    $('#id_'+slot+'_difficulty option').each(function() {
+      $(this).remove();
+    });
+    $(gear_table_val.contextOpts).each(function() {
+      var opt = $(this);
+      $('#id_'+slot+'_difficulty').append($('<option value="'+opt[0]+'">'+opt[1]+'</option>'))
+    });
+    var context = $('#id_'+slot+'_difficulty').val()
+
+    var stats = new Array("agility","crit","haste","mastery","multistrike","versatility")
     for (i=0;i<=stats.length;i++) {
       if (gear_table_val) {
-        $('#'+slot+'_'+stats[i]+' span').html(gear_table_val[stats[i]]);
-        $('#'+slot+'_'+stats[i]+' input').val(gear_table_val[stats[i]]);
+        $('#'+slot+'_'+stats[i]+' span').html(gear_table_val.contexts[context][stats[i]]);
+        $('#'+slot+'_'+stats[i]+' input').val(gear_table_val.contexts[context][stats[i]]);
         $('#icon_'+slot).attr('src',base_media_url+gear_table_val['icon']+'.jpg');
       }
       else {
-        if (stats[i] == "source" || stats[i] == "zone") {
-          $('#'+slot+'_'+stats[i]+' span').html("");
-        }
-        else {
-          $('#'+slot+'_'+stats[i]+' span').html("0");
-        }
+        $('#'+slot+'_'+stats[i]+' span').html("0");
         $('#'+slot+'_'+stats[i]+' input').val(0);
       }
     }
+
+    // weapon stats
     if (slot == "weapon") {
-      $('#weapon_min span').html(Math.ceil(gear_table_val['weapon_min']))
+      $('#weapon_min span').html(Math.ceil(gear_table_val.contexts[context]['weapon_min']))
       $('#weapon_min input').val(gear_table_val['weapon_min'])
-      $('#weapon_max span').html(Math.ceil(gear_table_val['weapon_max']))
+      $('#weapon_max span').html(Math.ceil(gear_table_val.contexts[context]['weapon_max']))
       $('#weapon_max input').val(gear_table_val['weapon_max'])
-      $('#weapon_speed span').html(Math.ceil(gear_table_val['weapon_speed']))
-      $('#weapon_speed input').val(gear_table_val['weapon_speed'])
+      $('#weapon_speed span').html(Math.ceil(gear_table_val.contexts[context]['weapon_speed']))
+      $('#weapon_speed input').val(gear_table_val.contexts[context]['weapon_speed'])
     }
-    var $this = $('#id_'+slot+'_difficulty');
-    var warforged = $('#id_'+slot+'_warforged').is(':checked') && Math.pow(1.15,6/15) || 1;
-    difficulty_switch(slot,$this.val(),warforged);
+
+    // zone and source
+    if (gear_table) {
+      $('#'+slot+'_source span').html(gear_table_val['source']);
+      $('#'+slot+'_zone span').html(gear_table_val['zone']);
+    }
+    else {
+      $('#'+slot+'_source span').html("");
+      $('#'+slot+'_zone span').html("");
+    }
+
+    difficulty_switch(slot);
   };
-  
-  function difficulty_switch(slot,val,warforged) {
-    var selected_gear = $('#id_'+slot).val();
-    var gear_table_val = selected_gear && gear_table[selected_gear.replace("'","\'")] || "";
-    factor = warforged;
-    ilvl = gear_table_val['ilvl']
-    if (val == 'heroic') {
-      factor = 1.15 * warforged;
-      ilvl += 10
-    }
-    else if (val == 'mythic') {
-      factor = 1.15 * 1.15 * warforged;
-      ilvl += 20
-    }
-    if (warforged != 1) {
-      ilvl += 6;
-    }
+
+  function difficulty_switch(slot) {
+    var val = $('#id_'+slot+'_difficulty'),
+        warforged = $('#id_'+slot+'_warforged').is(':checked'),
+        selected_gear = $('#id_'+slot).val(),
+        gear_table_val = selected_gear && gear_table[selected_gear.replace("'","\'")] || "";
+    factor = warforged ? Math.pow(1.15,6/15) : 1
+    var context = $('#id_'+slot+'_difficulty').val()
+
+    ilvl = gear_table_val.contexts[context]['ilvl']
+    ilvl = warforged ? ilvl + 6 : ilvl
     $('#'+slot+'_ilvl').html(ilvl);
     var stats = new Array("agility","crit","haste","mastery","multistrike","versatility");
-    for (i=0;i<=stats.length;i++) {
+    $.each(stats, function(index, stat) {
       if (selected_gear) {
-        $('#'+slot+'_'+stats[i]+' span').html(Math.ceil(gear_table_val[stats[i]]*factor));
-        $('#'+slot+'_'+stats[i]+' input').val(Math.ceil(gear_table_val[stats[i]]*factor));
+        $('#'+slot+'_'+stat+' span').html(Math.ceil(gear_table_val.contexts[context][stat]*factor));
+        $('#'+slot+'_'+stat+' input').val(Math.ceil(gear_table_val.contexts[context][stat]*factor));
       }
-    }
+    });
     if (slot == "weapon") {
-      $('#weapon_min span').html(Math.ceil(gear_table_val['weapon_min']*factor))
-      $('#weapon_min input').val(gear_table_val['weapon_min']*factor)
-      $('#weapon_max span').html(Math.ceil(gear_table_val['weapon_max']*factor))
-      $('#weapon_max input').val(gear_table_val['weapon_max']*factor)
+      $('#weapon_min span').html(Math.ceil(gear_table_val.contexts[context]['weapon_min']*factor))
+      $('#weapon_min input').val(gear_table_val.contexts[context]['weapon_min']*factor)
+      $('#weapon_max span').html(Math.ceil(gear_table_val.contexts[context]['weapon_max']*factor))
+      $('#weapon_max input').val(gear_table_val.contexts[context]['weapon_max']*factor)
     }
   }
-  
+
+  // set up onchange actions for items and difficulty toggles, and initialize
+  var slots = Array("weapon","head","neck","shoulders","back","chest","wrists","hands","waist","legs","feet","ring1","ring2","trinket1","trinket2");
+  $.each(slots, function(slot) {
+    $('#id_'+slots[slot]).change(function() {
+      var $this = $(this);
+      item_switch(slots[slot]);
+    })
+    $('#id_'+slots[slot]+'_difficulty').change(function() {
+      var $this = $(this);
+      var warforged = $('#id_'+slots[slot]+'_warforged').is(':checked');
+      difficulty_switch(slots[slot]);
+    })
+    $('#id_'+slots[slot]+'_warforged').change(function() {
+      var $this = $('#id_'+slots[slot]+'_difficulty');
+      var warforged = $('#id_'+slots[slot]+'_warforged').is(':checked');
+      difficulty_switch(slots[slot]);
+    })
+    //item_switch(slots[slot]);
+  });
+
   var gear_table,
       equipped;
   $.getJSON("{% url "hunter:gear_table" %}", function(data) {
     gear_table = data;
   }).done(function() {
     equipped = {{ equipped|safe }};
-    
+
     // put our equipped gear into gear_table if not already there
     for (i=0;i<equipped.length;i++) {
       var $name = equipped[i]['name'];
       var $id = equipped[i]['id'];
       if (!($id in gear_table)) {
         console.log('Could not find: ' + $id)
-        gear_table[equipped[i]['id']] = {'agility':equipped[i]['agility'],
-                                           'crit':equipped[i]['crit'],
-                                           'haste':equipped[i]['haste'],
-                                           'mastery':equipped[i]['mastery'],
-                                           'multistrike':equipped[i]['multistrike'],
-                                           'versatility':equipped[i]['versatility'],
-                                           'weapon_min':equipped[i]['minw'],
-                                           'weapon_max':equipped[i]['maxw'],
-                                           'weapon_speed':equipped[i]['speedw'],
+        gear_table[equipped[i]['id']] = {'contexts':{'armory-import':
+                                                    {'agility':equipped[i]['agility'],
+                                                     'crit':equipped[i]['crit'],
+                                                     'haste':equipped[i]['haste'],
+                                                     'mastery':equipped[i]['mastery'],
+                                                     'multistrike':equipped[i]['multistrike'],
+                                                     'versatility':equipped[i]['versatility'],
+                                                     'weapon_min':equipped[i]['minw'],
+                                                     'weapon_max':equipped[i]['maxw'],
+                                                     'weapon_speed':equipped[i]['speedw'],
+                                                     'ilvl':equipped[i]['ilvl']}},
+                                           'contextOpts':[['armory-import','Armory Import']],
                                            'socket':'',
                                            'icon':equipped[i]['icon'],
                                            'source':'(equipped)',
@@ -310,43 +345,28 @@
         $('#id_'+equipped[i]['slot'])
                         .append($('<option>')
                         .attr('value',equipped[i]['id'])
-                        .text(equipped[i]['name']));        
+                        .text(equipped[i]['name']));
       }
       // select it
-      $('#id_'+equipped[i]['slot']).val(equipped[i]['id']);  
-      if( equipped[i]['warforged'] == true ) {
-        $('#id_'+equipped[i]['slot']+'_warforged').attr('checked','checked')
-      }
-      if( equipped[i]['context'] == 'raid-heroic' ) {
-        $('#id_'+equipped[i]['slot']+'_difficulty').val('heroic')
-      }
-      else if( equipped[i]['context'] == 'raid-mythic' ) {
-        $('#id_'+equipped[i]['slot']+'_difficulty').val('mythic')
-      }
+      $('#id_'+equipped[i]['slot']).val(equipped[i]['id'].toString());
     };
-      
-    // set up onchange actions for items and difficulty toggles, and initialize
-    var slots = Array("weapon","head","neck","shoulders","back","chest","wrists","hands","waist","legs","feet","ring1","ring2","trinket1","trinket2");
+
     $.each(slots, function(slot) {
-      $('#id_'+slots[slot]).change(function() {
-        var $this = $(this);
-        item_switch(slots[slot],$this.val());
-      })
-      $('#id_'+slots[slot]+'_difficulty').change(function() {
-        var $this = $(this);
-        var warforged = $('#id_'+slots[slot]+'_warforged').is(':checked') && Math.pow(1.15,6/15) || 1;
-        difficulty_switch(slots[slot],$this.val(),warforged);
-      })
-      $('#id_'+slots[slot]+'_warforged').change(function() {
-        var $this = $('#id_'+slots[slot]+'_difficulty');
-        var warforged = $('#id_'+slots[slot]+'_warforged').is(':checked') && Math.pow(1.15,6/15) || 1;
-        difficulty_switch(slots[slot],$this.val(),warforged);
-      })
-      item_switch(slots[slot],$('#id_'+slots[slot]).val());
+      item_switch(slots[slot]);
     });
+    $.each(equipped, function(index,value) {
+      if (value['context']) {
+        $('#id_'+value['slot']+'_difficulty').val(value['context']);
+      }
+      if( value['warforged'] == true ) {
+        $('#id_'+value['slot']+'_warforged').attr('checked','checked');
+      }
+      difficulty_switch(value['slot']);
+    });
+
     model_url = "{% url "hunter:model" %}?" + $('#hunter-form').serialize();
     $('#full-model').attr('href',model_url);
     aoemodel_url = "{% url "hunter:aoemodel" %}?" + $('#hunter-form').serialize();
     $('#full-model-aoe').attr('href',aoemodel_url);
-  });
+  })
 </script>

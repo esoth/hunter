@@ -4,7 +4,21 @@
 {% block content %}
   <div class="container">
     <h1>Change Log</h1>
-    
+
+    <h3>2 November 2014</h3>
+    <ul class="list-group">
+      <li class="list-group-item">Item selection form redesigned! Available contexts are now dynamic.</li>
+      <li class="list-group-item">The <a href="{% url 'gearitem:listing'}">gear list</a> has been updated extensively.</li>
+      <li class="list-group-item">More trinkets added</li>
+      <li class="list-group-item">Updated gem values</li>
+      <li class="list-group-item">Added enchant stats</li>
+      <li class="list-group-item">Added option to set enchant/food stat explicitly or implicitly by spec</li>
+      <li class="list-group-item">Adaptibility increases combat experience value to 70%</li>
+      <li class="list-group-item">Focusing Shot cast time lowered to 2.5s</li>
+      <li class="list-group-item">Fixed a bug with MM model incorrectly delaying aimed shot in some cases</li>
+      <li class="list-group-item">Added MM set bonuses</li>
+    </ul>
+
     <h3>20 October 2014</h3>
     <p>
       Please note the latest changes of ~15% increases to most abilities are not in yet, but I did include the pet inheritance change.
@@ -23,14 +37,14 @@
       <li class="list-group-item">Chimera Shot increased to 510%</li>
       <li class="list-group-item">Fixed MM mastery to start at 4% and increase by 0.5% per 110 mastery</li>
     </ul>
-    
+
     <h3>13 October 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Fixed Spiked Collar to give 10% crit and speed</li>
       <li class="list-group-item">Fixed minor bug with weapon damage</li>
       <li class="list-group-item">Explosive Trap increased to 8.5% AP</li>
     </ul>
-    
+
     <h3>2 October 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Serpent Sting increased to 176% AP</li>
@@ -42,31 +56,31 @@
       <li class="list-group-item">Arcane Shot increased to 110% weapon damage</li>
       <li class="list-group-item">Multi-Shot increased to 40% weapon damage</li>
     </ul>
-      
-    
+
+
     <h3>22 September 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Black Arrow lowered from 510% AP to 400% AP</li>
       <li class="list-group-item">Dire Beast focus gen lowered to 2 per hit</li>
     </ul>
-    
+
     <h3>19 September 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Serpent Sting lowered from 175% AP to 160% AP</li>
       <li class="list-group-item">Explosive Shot lowered to 39%</li>
     </ul>
-    
+
     <h3>6 September 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Steady Shot increased from 60% to 75% weapon damage</li>
       <li class="list-group-item">Lock and Load reverted to old behavior - three charges, no multistrike interaction, no focus cost, resets cooldown</li>
     </ul>
-    
+
     <h3>30 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Barrage should now make the hunter pool more focus to use it frequently</li>
     </ul>
-    
+
     <h3>29 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Thrill of the Hunt changed to give a 6% chance per 10 focus</li>
@@ -76,7 +90,7 @@
       <li class="list-group-item">Added special rotation conditions to try to maximize Steady Focus and Barrage. Let me know if you see issues.</li>
       <li class="list-group-item">Fixed bug with Enhanced Aimed Shot</li>
     </ul>
-  
+
     <h3>21 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Arcane Shot lowered to 100% weapon damage</li>
@@ -86,7 +100,7 @@
       <li class="list-group-item">Serpent Sting lowered to 175% AP</li>
       <li class="list-group-item">Enhanced Basic Attacks chance lowered to 15%</li>
     </ul>
-  
+
     <h3>19 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Steady Shot increased to 60% weapon damage</li>
@@ -100,14 +114,14 @@
       <li class="list-group-item">Serpent Sting increase to 225% AP</li>
       <li class="list-group-item">Chimera Shot increased to 385% weapon damage</li>
     </ul>
-  
+
     <h3>9 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Website change: moved location of current DPS</li>
       <li class="list-group-item">Thrill of the Hunt fixed to proc on itself, if focus is spent</li>
       <li class="list-group-item">Options enabled</li>
     </ul>
-  
+
     <h3>7 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Kill Shot is 20% for BM, 35% for MM</li>
@@ -125,14 +139,14 @@
       <li class="list-group-item">Aimed Shot - AP coefficient has 20% Draenor Perk baked in</li>
       <li class="list-group-item">Black Arrow - AP coefficient has 20% Draenor Perk baked in</li>
     </ul>
-  
+
     <h3>5 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Updated Poisoned Ammo to 6% AP per tick (48% total)</li>
       <li class="list-group-item">Added special conditions for SV and BM usage of Arcane Shot</li>
       <li class="list-group-item">Stat scaling now in increments of 100</li>
     </ul>
-  
+
     <h3>2 August 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Fixed an issue with pet basic attacks sometimes not being used</li>
@@ -141,13 +155,13 @@
       <li class="list-group-item">Pets were inaccurately not able to crit</li>
       <li class="list-group-item">Added AJAX load for scaling</li>
     </ul>
-  
+
     <h3>31 July 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Fixed an issue with Bestial Wrath incorrectly active at the start</li>
       <li class="list-group-item">Fixed an issue with Serpent Sting</li>
     </ul>
-    
+
     <h3>30 July 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">Added js to rename Adaptibility/Lone Wolf</li>
@@ -157,7 +171,7 @@
       <li class="list-group-item">Added FAQ</li>
       <li class="list-group-item">Fixed armor mitigation display bug</li>
     </ul>
-  
+
     <h3>29 July 2014</h3>
     <ul class="list-group">
       <li class="list-group-item">log init</li>
