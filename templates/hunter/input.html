@@ -356,7 +356,9 @@
     });
     $.each(equipped, function(index,value) {
       if (value['context']) {
-        $('#id_'+value['slot']+'_difficulty').val(value['context']);
+        if ($.inArray(value['context'],$('#id_'+value['slot']+'_difficulty option').map(function() {return $(this).val();}).get())>= 0) {
+          $('#id_'+value['slot']+'_difficulty').val(value['context']);
+        }
       }
       if( value['warforged'] == true ) {
         $('#id_'+value['slot']+'_warforged').attr('checked','checked');

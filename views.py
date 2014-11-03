@@ -1,4 +1,5 @@
 from django import forms
+from django.views.decorators.cache import cache_page
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http.request import QueryDict
@@ -160,6 +161,7 @@ def contextsort(val):
     return ranks.index(val[0])
   return len(ranks)
 
+@cache_page(3600)
 def GearTableView(request):
   gear_table = {'':{'source':'','agility':'','crit':'','haste':'','mastery':'','multistrike':'','versatility':'','zone':'','source':''}}
 
