@@ -1,3 +1,13 @@
+#form-wrapper {
+  background: #cccccc url('/static/hunter/ajax-loader.gif') no-repeat local center;
+  opacity: 0.6;
+  position: absolute;
+  left: auto;
+  top: auto;
+  z-index: 10;
+  display: block;
+}
+
 #sub-banner {
   height: 25px;
   background: transparent url(inv_misc_ammo_arrow_01.jpg) repeat-x;

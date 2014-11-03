@@ -16,6 +16,7 @@
     <a id="detailsToggler" href="javascript:void(0);">[ show/hide details ]</a>
   </li>
 </ul>
+<div id="form-wrapper"></div>
 <form method="POST" action="{% url 'hunter:calc' %}" id="hunter-form">
   <input id="lastcalc" name="lastcalc" type="hidden" value="{{ totals.dps }}" />
   <div class="tab-content" id="subtabs">
@@ -148,6 +149,16 @@
     Calculate
   </button>
 </form>
+<script type="text/javascript">
+  var hform = $('#hunter-form'),
+      wrapper = $('#form-wrapper');
+  wrapper.css('height',hform.height());
+  wrapper.css('width',hform.width());
+  $(window).resize(function() {
+    wrapper.css('height',hform.height());
+    wrapper.css('width',hform.width());
+  })
+</script>
 <br/>
 <br/>
 
@@ -349,6 +360,7 @@
       }
       // select it
       $('#id_'+equipped[i]['slot']).val(equipped[i]['id'].toString());
+
     };
 
     $.each(slots, function(slot) {
@@ -370,5 +382,6 @@
     $('#full-model').attr('href',model_url);
     aoemodel_url = "{% url "hunter:aoemodel" %}?" + $('#hunter-form').serialize();
     $('#full-model-aoe').attr('href',aoemodel_url);
+    $('#form-wrapper').hide();
   })
 </script>
