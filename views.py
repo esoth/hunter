@@ -227,7 +227,6 @@ def processEquippedGear(data):
   # sockets
   sockets = []
   for s in SLOTS:
-    sss = s
     if data[s]:
       try:
         _data['equipped'].append({'id':int(data[s]),'bonus':''})
@@ -316,7 +315,7 @@ def process_armory(armory_form):
             'character':armory_form['character'],
             'apikey':API_KEY}
   url = 'https://%(region)s.api.battle.net/wow/character/%(server)s/%(character)s?apikey=%(apikey)s&fields=stats,talents,items' % kwargs
-  title = '%s of %s (%s)' % (character, SERVER_NAMES[server], region)
+  title = '%s of %s (%s)' % (character, SERVER_NAMES.get(server,server), region)
   data = json.load(urlopen(url.encode('utf-8')))
   if data.get('status') == 'nok':
     return None
@@ -339,8 +338,8 @@ def process_armory(armory_form):
     for stat in slot['stats']:
       if stat['stat'] in stats_used:
         attrs[stats_used[stat['stat']]] = stat['amount']
-    if 'gem1' in slot['tooltipParams']:
-      attrs['gem'] = slot['tooltipParams']['gem1']
+    if 'gem0' in slot['tooltipParams']:
+      attrs['socket'] = slot['tooltipParams']['gem0']
     attrs['id'] = slot['id']
     attrs['name'] = slot['name']
     attrs['ilvl'] = slot['itemLevel']
@@ -445,6 +444,9 @@ def CalcView(request):
           minw = attrs.get('min',0)
           maxw = attrs.get('max',0)
           speedw = attrs.get('speed',3)
+        warforged = False
+        if attrs.get('bonuses') and attrs['bonuses'] and 499 in attrs['bonuses']:
+          warforged = True
         equipped.append({'id':attrs.get('id') or '(Not equipped - %s)' % slot,
                       'agility':attrs.get('agility',0),
                       'crit':attrs.get('crit',0),
@@ -457,8 +459,9 @@ def CalcView(request):
                       'versatility':attrs.get('versatility',0),
                       'icon':attrs.get('icon','inv_misc_questionmark'),
                       'name':attrs.get('name') or '(Not equipped)',
+                      'socket':attrs.get('socket'),
                       'context':attrs.get('context'),
-                      'warforged':attrs.get('bonuses') and 448 in attrs['bonuses'],
+                      'warforged':warforged,
                       'slot':slot,
                       'ilvl':attrs.get('ilvl',0),
           })

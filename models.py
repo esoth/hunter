@@ -12,13 +12,12 @@ tier5=[(TIER5.index(t),t) for t in TIER5]
 tier6=[(TIER6.index(t),t) for t in TIER6]
 tier7=[(TIER7.index(t),t) for t in TIER7]
 
-enchants = (('','(none)'),
+enchants = (('spec','Use spec attunement'),
             ('crit','Critical Strike'),
             ('haste','Haste'),
             ('mastery','Mastery'),
             ('multistrike','Multistrike'),
-            ('versatility','Versatility'),
-            ('spec','Use spec attunement'),)
+            ('versatility','Versatility'),)
 
 class HunterModel(models.Model):
     race = models.IntegerField(default=4, # Night Elf

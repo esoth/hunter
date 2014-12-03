@@ -171,14 +171,6 @@
       </div>
       <form action="{% url 'hunter:calc' %}" method="POST">
         <div class="modal-body">
-          <div class="panel panel-danger">
-            <div class="panel-heading">
-              <h3 class="panel-title">Warning</h3>
-            </div>
-            <div class="panel-body">
-              Item upgrades for level 90s are ignored - sorry!
-            </div>
-          </div>
           {{ armory_form.as_p }}
           {% csrf_token %}
         </div>
@@ -360,6 +352,10 @@
       }
       // select it
       $('#id_'+equipped[i]['slot']).val(equipped[i]['id'].toString());
+      $('#id_'+equipped[i]['slot']+'_socket').val(equipped[i]['socket']);
+      if (equipped[i]['warforged']) {
+        $('#id_'+equipped[i]['slot']+'_warforged').prop('checked',true);
+      };
 
     };
 
