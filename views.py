@@ -482,6 +482,7 @@ def CalcView(request):
                     'context':gear.data[slot+'_difficulty'],
                     'icon':'inv_misc_questionmark',
                     'name':'(armory import - %s)' % slot,
+                    'socket':gear.data['%s_socket' % slot],
                     'slot':slot,
                     'ilvl':0,
         })
