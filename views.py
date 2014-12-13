@@ -294,7 +294,11 @@ def process_form_data(gear,metadata,bmo,mmo,svo,aeo):
   if meta.race != UNDEAD:
     spelltable = [spell for spell in spelltable if spell['name'] != 'Touch of the Grave']
   stattable = hunter.do_stats()
-  proc_info = procs.proc_info(gear['equipped'],hunter.haste.total())
+  
+  scope_stat = meta.enchants
+  if scope_stat == 'spec':
+    scope_stat = ['mastery','crit','multistrike'][meta.spec]
+  proc_info = procs.proc_info(gear['equipped'],hunter.haste.total(),scope_stat)
   hunter.do_procs(proc_info)
   stattable = hunter.do_stats()
   return {'meta':meta,
@@ -445,8 +449,10 @@ def CalcView(request):
           maxw = attrs.get('max',0)
           speedw = attrs.get('speed',3)
         warforged = False
-        if attrs.get('bonuses') and attrs['bonuses'] and 499 in attrs['bonuses']:
-          warforged = True
+        if attrs.get('bonuses') and attrs['bonuses']:
+          for bon in (499,560,561,562,563):
+            if bon in attrs['bonuses']:
+              warforged = True
         equipped.append({'id':attrs.get('id') or '(Not equipped - %s)' % slot,
                       'agility':attrs.get('agility',0),
                       'crit':attrs.get('crit',0),
