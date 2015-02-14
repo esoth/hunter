@@ -286,6 +286,7 @@ def process_form_data(gear,metadata,bmo,mmo,svo,aeo):
   options['mm1'] = int(mmo.data.get('opt_mm1',0))
   options['mm2'] = int(mmo.data.get('opt_mm2',0))
   options['mm3'] = mmo.data.get('opt_mm3',False)
+  options['sv1'] = mmo.data.get('opt_sv1',False)
   options['aoe1'] = int(mmo.data.get('opt_aoe1',0))
   options['aoe2'] = mmo.data.get('opt_aoe2',False)
   options['aoe3'] = int(mmo.data.get('opt_aoe3',0))

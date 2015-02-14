@@ -81,8 +81,8 @@ class MMOptionsModel(models.Model):
                          verbose_name="Only cast instant shots after Focusing Shot")
 
 class SVOptionsModel(models.Model):
-    opt_sv2 = models.BooleanField(default=True,
-                         verbose_name="Null action - place holder")
+    opt_sv1 = models.BooleanField(default=True,
+                         verbose_name="Ignore level 100 talents for single target")
 
 class AOEOptionsModel(models.Model):
     opt_aoe1 = models.IntegerField(default=8,
